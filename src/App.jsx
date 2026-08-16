@@ -28,6 +28,12 @@ import {
   Building
 } from 'lucide-react';
 
+const getAssetUrl = (path) => {
+  const base = import.meta.env.BASE_URL || '/';
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${base}${cleanPath}`;
+};
+
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState('inicio');
@@ -361,7 +367,7 @@ export default function App() {
       <header className="mpp-header">
         <div className="container mpp-header__container">
           <div className="mpp-header__brand" onClick={() => navigateTo('inicio')}>
-            <img src={theme === 'dark' ? '/logo-horizontal-white.png' : '/logo-horizontal-color.png'} alt="MAGMA POWER PLANT" className="mpp-header__logo" />
+            <img src={theme === 'dark' ? getAssetUrl('/logo-horizontal-white.png') : getAssetUrl('/logo-horizontal-color.png')} alt="MAGMA POWER PLANT" className="mpp-header__logo" />
           </div>
 
           {/* Desktop Nav */}
@@ -436,7 +442,7 @@ export default function App() {
 
                 <div className="mpp-hero__image-wrapper">
                   <div className="mpp-hero__image-card">
-                    <img src="/logo-3d-transparent.png" alt="Magma Power Plant 3D Logo" className="mpp-hero__logo-3d" />
+                    <img src={getAssetUrl('/logo-3d-transparent.png')} alt="Magma Power Plant 3D Logo" className="mpp-hero__logo-3d" />
                     <div className="mpp-hero__badge">
                       <ShieldCheck size={20} className="color-forest" />
                       <span>{t('hero_badge')}</span>
@@ -510,7 +516,7 @@ export default function App() {
                 <p className="mt-4">
                   {t('company_intro_p2')}
                 </p>
-                <img src="/geomagmatic-energy.png" alt="Proceso de transferencia Geomagmática" className="mpp-compania-img mt-4" />
+                 <img src={getAssetUrl('/geomagmatic-energy.png')} alt="Proceso de transferencia Geomagmática" className="mpp-compania-img mt-4" />
               </div>
               <div className="mpp-compania-intro__detail card-gradient-glow">
                 <h3>{t('company_science_title')}</h3>
@@ -632,7 +638,7 @@ export default function App() {
               </div>
               <div className="mpp-tech-visual-block">
                 <div className="mpp-tech-img-container">
-                  <img src="/orc-turbine.png" alt="Turbogenerador ORC Magma" className="mpp-tech-main-img" />
+                   <img src={getAssetUrl('/orc-turbine.png')} alt="Turbogenerador ORC Magma" className="mpp-tech-main-img" />
                 </div>
               </div>
             </div>
@@ -688,7 +694,7 @@ export default function App() {
             {/* Services Grid */}
             <div className="grid mpp-grid-2 mpp-services-list">
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src="/solar-plant.png" alt="Plantas de Energía Solar" className="mpp-service-img" />
+                <img src={getAssetUrl('/solar-plant.png')} alt="Plantas de Energía Solar" className="mpp-service-img" />
                 <div className="mpp-service-content">
                   <h3 className="color-magma">1. Plantas de Energía Solar</h3>
                   <p>
@@ -698,7 +704,7 @@ export default function App() {
               </div>
 
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src="/geothermal-plant.png" alt="Proyectos de Energía Geotermal" className="mpp-service-img" />
+                <img src={getAssetUrl('/geothermal-plant.png')} alt="Proyectos de Energía Geotermal" className="mpp-service-img" />
                 <div className="mpp-service-content">
                   <h3 className="color-forest">2. Proyectos de Energía Geotermal</h3>
                   <p>
@@ -708,7 +714,7 @@ export default function App() {
               </div>
 
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src="/geomagmatic-energy.png" alt="Tecnologías Geomagmáticas R&D" className="mpp-service-img" />
+                <img src={getAssetUrl('/geomagmatic-energy.png')} alt="Tecnologías Geomagmáticas R&D" className="mpp-service-img" />
                 <div className="mpp-service-content">
                   <h3 className="color-electric">3. Tecnologías Geomagmáticas R&D</h3>
                   <p>
@@ -718,7 +724,7 @@ export default function App() {
               </div>
 
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src="/piping-layout.png" alt="Diseño 3D Piping Inteligente" className="mpp-service-img" />
+                <img src={getAssetUrl('/piping-layout.png')} alt="Diseño 3D Piping Inteligente" className="mpp-service-img" />
                 <div className="mpp-service-content">
                   <h3 className="color-grey">4. Diseño 3D Piping Inteligente</h3>
                   <p>
@@ -927,7 +933,7 @@ export default function App() {
                 <div className="mpp-franquicia-docs">
                   <h4>{t('franchise_docs_title')}</h4>
                   <div className="mpp-doc-links mt-2">
-                    <a href="/certificado-franquicia.pdf" target="_blank" rel="noopener noreferrer" className="mpp-doc-btn">
+                    <a href={getAssetUrl('/certificado-franquicia.pdf')} target="_blank" rel="noopener noreferrer" className="mpp-doc-btn">
                       <FileText size={16} /> {t('franchise_doc_cert')}
                     </a>
                     <a href="https://magmapowerplant.com/wp-content/uploads/2025/08/EN-DESARROLLO.pdf" target="_blank" rel="noopener noreferrer" className="mpp-doc-btn">
@@ -948,7 +954,7 @@ export default function App() {
 
               <div style={{ position: 'relative', width: '100%', border: '1px solid var(--color-border)', borderRadius: '12px', overflow: 'hidden', background: '#080f1c' }} className="mt-4 animate-fade">
                 <iframe
-                  src="/magma-jv-map.html"
+                  src={getAssetUrl('/magma-jv-map.html')}
                   title="Mapa global de Joint Ventures MAGMA"
                   loading="lazy"
                   style={{ width: '100%', height: '1180px', border: '0', display: 'block' }}
@@ -1172,7 +1178,7 @@ export default function App() {
       <footer className="mpp-footer">
         <div className="container mpp-footer__container">
           <div className="mpp-footer__left">
-            <img src={theme === 'dark' ? '/logo-footer-dark.png' : '/logo-footer-light.png'} alt="Logo Magma" className="mpp-footer__logo" />
+            <img src={theme === 'dark' ? getAssetUrl('/logo-footer-dark.png') : getAssetUrl('/logo-footer-light.png')} alt="Logo Magma" className="mpp-footer__logo" />
             <p>{t('footer_desc')}</p>
           </div>
           <div className="mpp-footer__center">

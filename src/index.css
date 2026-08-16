@@ -650,7 +650,7 @@ strong {
 
 .mpp-hero__image-card {
   position: relative;
-  background-image: linear-gradient(rgba(10, 11, 16, 0.75), rgba(10, 11, 16, 0.85)), url('/magma-logo-bg.png');
+  background-image: linear-gradient(rgba(10, 11, 16, 0.75), rgba(10, 11, 16, 0.85)), url('../public/magma-logo-bg.png');
   background-size: cover;
   background-position: center;
   border: 1px solid rgba(255, 93, 2, 0.2);
