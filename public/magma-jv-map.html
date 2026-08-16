@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAGMA · Mapa global de Joint Ventures (embed)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    background:var(--bg); color:var(--fg);
+    transition:background .35s ease,color .35s ease;
+  }
+  /* ---- themes ---- */
+  body[data-theme="magma"]{
+    --bg:#080f1c; --panel:#0e1a2c; --panel2:#122238; --fg:#e8eef6; --dim:#8ea3bd;
+    --line:#1e3450; --accent:#f0621f; --ocean:#0a1526; --nodata:#152437; --nodataLine:#22364f;
+    --shadow:0 18px 40px -24px #000;
+  }
+  body[data-theme="claro"]{
+    --bg:#f7f5f1; --panel:#fffefb; --panel2:#f1ede6; --fg:#1d1b18; --dim:#6f6a62;
+    --line:#e0dad0; --accent:#c1461a; --ocean:#eeeae3; --nodata:#e6e1d9; --nodataLine:#d6cfc4;
+    --shadow:0 16px 36px -26px #6b6257;
+  }
+  body[data-theme="tinta"]{
+    --bg:#121212; --panel:#1a1a1a; --panel2:#222; --fg:#f2f0ec; --dim:#9a9691;
+    --line:#2e2e2e; --accent:#ff7a1a; --ocean:#151515; --nodata:#242424; --nodataLine:#333;
+    --shadow:0 18px 40px -26px #000;
+  }
+  .wrap{max-width:1440px;margin:0 auto;padding:28px 24px 32px}
+  body{min-height:100vh}
+  footer{margin-top:20px}
+  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;
+    border-bottom:1px solid var(--line);padding-bottom:20px}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  h1{font-family:Archivo,sans-serif;font-weight:800;font-size:clamp(28px,4vw,44px);line-height:1.02;margin:0;letter-spacing:-.015em;text-transform:uppercase}
+  h1 span{display:block;font-weight:500;font-size:clamp(13px,1.4vw,17px);letter-spacing:.06em;color:var(--dim);text-transform:none;margin-top:10px}
+  .themes{display:flex;gap:8px;align-items:center}
+  .themes b{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:400;margin-right:4px}
+  .tbtn{font:500 12px/1 "IBM Plex Sans",sans-serif;padding:9px 13px;border-radius:999px;cursor:pointer;
+    background:transparent;color:var(--dim);border:1px solid var(--line)}
+  .tbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* ---- stats ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);margin:24px 0 20px}
+  .stat{background:var(--panel);padding:16px 18px}
+  .stat i{display:block;font-family:Archivo,sans-serif;font-style:normal;font-weight:800;font-size:30px;line-height:1}
+  .stat s{display:block;text-decoration:none;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:8px}
+  /* ---- controls ---- */
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+  .search{flex:1 1 260px;display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--line);padding:10px 14px;border-radius:999px}
+  .search input{flex:1;background:none;border:0;outline:0;color:var(--fg);font:400 14px/1.2 "IBM Plex Sans",sans-serif}
+  .search input::placeholder{color:var(--dim)}
+  .search svg{flex:none;opacity:.6}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:8px 13px;font:500 12px/1 "IBM Plex Sans",sans-serif;color:var(--dim)}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .chip[aria-pressed="true"]{color:var(--fg);border-color:currentColor}
+  /* ---- layout ---- */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+  .mapbox{position:relative;background:var(--ocean);border:1px solid var(--line);overflow:hidden}
+  svg.map{display:block;width:100%;height:auto}
+  path.grat{fill:none;stroke:var(--nodataLine);stroke-width:.4;opacity:.55;pointer-events:none}
+  path.sphere{fill:none;stroke:var(--nodataLine);stroke-width:.9;opacity:.8;pointer-events:none}
+  path.arc{fill:none;stroke:var(--accent);stroke-width:.9;opacity:.5;stroke-dasharray:3 5;pointer-events:none;
+    animation:flow 9s linear infinite}
+  @keyframes flow{to{stroke-dashoffset:-160}}
+  g.deco{pointer-events:none}
+  g.deco line{stroke:var(--nodataLine);stroke-width:.7;opacity:.7}
+  g.deco text{font-family:"IBM Plex Mono",monospace;font-size:7px;letter-spacing:.14em;fill:var(--dim);opacity:.7}
+  circle.halo{fill:none;stroke-width:1;opacity:.35;animation:pulse 3.4s ease-out infinite}
+  @keyframes pulse{0%{r:13;opacity:.45}70%{opacity:0}100%{r:30;opacity:0}}
+  path.country{stroke:var(--ocean);stroke-width:.4;cursor:pointer;transition:fill-opacity .18s ease}
+  path.country.muted{fill-opacity:.16;cursor:default}
+  path.country.dim{fill-opacity:.28}
+  .marker{cursor:pointer}
+  .marker circle.ring{fill:none;stroke-width:1.4}
+  .marker circle.core{stroke:#fff;stroke-width:1.6}
+  .marker .ico{fill:#fff}
+  .marker .ico rect.win{fill:currentColor;opacity:.45}
+  .marker circle.badge{stroke-width:1.1}
+  .marker text.num{font-family:Archivo,sans-serif;font-weight:800;font-size:7px;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .marker text{font-family:Archivo,sans-serif;font-weight:800;font-size:9px;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .pop{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-100%);
+    background:var(--panel2);border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:10px 12px;min-width:150px;transition:opacity .14s ease}
+  .pop.on{opacity:1}
+  .pop .r{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .pop .t{font-family:Archivo,sans-serif;font-weight:600;font-size:14px;margin-top:4px}
+  .pop .s{font-size:12px;color:var(--dim);margin-top:3px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 22px;padding:14px 16px;border-top:1px solid var(--line);background:var(--panel)}
+  .legend span{display:flex;align-items:center;gap:8px;font:400 11px/1 "IBM Plex Sans",sans-serif;color:var(--dim)}
+  .legend i{width:22px;height:8px;display:block}
+  /* ---- side ---- */
+  .side{background:var(--panel);border:1px solid var(--line);position:sticky;top:20px;max-height:calc(100vh - 40px);display:flex;flex-direction:column}
+  .side h2{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+    font-weight:400;margin:0;padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .side h2 button{background:none;border:0;color:var(--accent);font:inherit;letter-spacing:.14em;cursor:pointer;text-transform:uppercase}
+  .list{overflow:auto;padding:8px}
+  .item{width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;cursor:pointer;
+    padding:13px 14px;display:block;color:inherit;font:inherit}
+  .item:hover,.item.active{background:var(--panel2)}
+  .item .nm{font-family:Archivo,sans-serif;font-weight:600;font-size:14px;display:flex;align-items:center;gap:9px}
+  .item .nm em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;color:#fff;background:currentColor;
+    width:17px;height:17px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .item .nm em b{color:#fff;font-weight:500}
+  .item .sb{font-size:12px;color:var(--dim);margin-top:5px;line-height:1.45}
+  .detail{overflow:auto;padding:18px}
+  .detail .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;padding:5px 9px;color:#fff;margin-bottom:12px}
+  .detail h3{font-family:Archivo,sans-serif;font-weight:800;font-size:22px;margin:0 0 4px;text-transform:uppercase;letter-spacing:-.01em}
+  .detail .cls{font-size:12px;color:var(--dim);margin:0 0 18px}
+  .block{border-top:1px solid var(--line);padding:14px 0}
+  .block h4{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--dim);font-weight:400;margin:0 0 8px}
+  .block p{margin:0;font-size:13.5px;line-height:1.55}
+  .block .site{font-family:Archivo,sans-serif;font-weight:600;font-size:16px}
+  .block ul{margin:0;padding-left:16px;font-size:13.5px;line-height:1.7}
+  .block ul li::marker{color:var(--accent)}
+  .cta{display:block;text-align:center;margin-top:8px;padding:13px;background:var(--accent);color:#fff;
+    text-decoration:none;font-family:Archivo,sans-serif;font-weight:600;font-size:13px;letter-spacing:.02em}
+  a{color:var(--accent)}
+  a:hover{color:var(--fg)}
+  footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;
+    justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--dim)}
+  @media (pointer:coarse){
+    .marker circle.ring{r:19}
+  }
+  @media (max-width:1180px){
+    .grid{grid-template-columns:minmax(0,1fr) 320px}
+  }
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr}
+    .side{position:static;max-height:none}
+    .list{max-height:420px}
+    .wrap{padding:24px 18px 48px}
+    header.top{align-items:flex-start}
+    .themes{width:100%}
+  }
+  @media (max-width:640px){
+    .wrap{padding:20px 14px 40px}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat{padding:13px 14px}
+    .stat i{font-size:24px}
+    .chips{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .chip{flex:none}
+    .legend{gap:9px 14px;padding:12px}
+    .legend span{font-size:10px}
+    .pop{min-width:130px;padding:8px 10px}
+    .pop .t{font-size:13px}
+    g.deco text{display:none}
+    footer{font-size:9px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    path.arc,circle.halo{animation:none}
+  }
+</style>
+</head>
+<body data-theme="magma">
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">Ecosistema global de energía y tecnología</p>
+      <h1>Mapa global de Joint Ventures<span>Seis joint ventures regionales, cuatro campus estratégicos y dos centros tecnológicos.</span></h1>
+    </div>
+    <div class="themes">
+      <b>Estilo</b>
+      <button class="tbtn" data-t="magma" aria-pressed="true">Magma</button>
+      <button class="tbtn" data-t="claro" aria-pressed="false">Claro</button>
+      <button class="tbtn" data-t="tinta" aria-pressed="false">Tinta</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><i>6</i><s>Joint ventures regionales</s></div>
+    <div class="stat"><i>4</i><s>Campus estratégicos</s></div>
+    <div class="stat"><i>2</i><s>Centros tecnológicos</s></div>
+    <div class="stat"><i>+140</i><s>Países cubiertos</s></div>
+  </div>
+
+  <div class="controls">
+    <label class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Buscar país, JV o sede (p. ej. Irlanda, Singapur)" autocomplete="off">
+    </label>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="mapbox" id="mapbox">
+        <svg class="map" id="map" viewBox="0 0 960 500" role="img" aria-label="Mapa mundial de joint ventures MAGMA"></svg>
+        <div class="pop" id="pop"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <aside class="side">
+      <h2 id="sideTitle"><span>Directorio</span><button id="back" hidden>← Volver</button></h2>
+      <div class="list" id="list"></div>
+      <div class="detail" id="detail" hidden></div>
+    </aside>
+  </div>
+
+  <footer>
+    <span>Geometría: Natural Earth · world-atlas</span>
+    <span>Energía que transforma el futuro</span>
+  </footer>
+</div>
+
+<script>
+const REGIONS = [
+  { id:"na", n:1, name:"JV North America", cls:"A", clsName:"Strategic Campus JV", color:"#3d7fbf", lightColor:"#8fb8db",
+    countries:"Estados Unidos, Canadá, México", countriesEn:"United States, Canada, Mexico",
+    siteKind:"Campus estratégico", siteKindEn:"Strategic Campus",
+    site:"NEVADA, USA", siteSub:"Reno–Sparks Tech Park", siteSubEn:"Reno–Sparks Tech Park",
+    focus:["Tecnología Avanzada","Centros de Datos","Geotermia","Manufactura de Alta Precisión","Innovación e I+D"],
+    focusEn:["Advanced Technology","Data Centers","Geothermal","High-Precision Manufacturing","Innovation & R&D"],
+    lonlat:[-119.8,39.5] },
+  { id:"latam", n:2, name:"JV LATAM", cls:"A", clsName:"Strategic Campus JV", color:"#7d9c3c", lightColor:"#b6c98c",
+    countries:"México, Centroamérica, Caribe, Sudamérica", countriesEn:"Mexico, Central America, Caribbean, South America",
+    siteKind:"Campus estratégico", siteKindEn:"Strategic Campus",
+    site:"COSTA RICA", siteSub:"Guanacaste Innovation Park", siteSubEn:"Guanacaste Innovation Park",
+    focus:["Energía Geotérmica","Infraestructura","Minería","Manufactura Regional","Desarrollo de Proyectos"],
+    focusEn:["Geothermal Energy","Infrastructure","Mining","Regional Manufacturing","Project Development"],
+    lonlat:[-84.1,10.0] },
+  { id:"eu", n:3, name:"JV Europe", cls:"B", clsName:"Regional Development JV", color:"#e0a41f", lightColor:"#eccd85",
+    countries:"Unión Europea, Reino Unido, Países Nórdicos", countriesEn:"European Union, United Kingdom, Nordic Countries",
+    siteKind:"Centro tecnológico", siteKindEn:"Technology Center",
+    site:"IRLANDA", siteSub:"Dublín Tech Hub", siteSubEn:"Dublin Tech Hub",
+    focus:["Ingeniería y Diseño","Certificaciones","Soporte Técnico Regional","Innovación"],
+    focusEn:["Engineering & Design","Certifications","Regional Technical Support","Innovation"],
+    lonlat:[-6.26,53.35] },
+  { id:"apac", n:4, name:"JV Asia Pacific", cls:"A", clsName:"Strategic Campus JV", color:"#2f9098", lightColor:"#93c4c8",
+    countries:"India, ASEAN, Japón, Corea del Sur, Australia, Nueva Zelanda, Pacífico", countriesEn:"India, ASEAN, Japan, South Korea, Australia, New Zealand, Pacific",
+    siteKind:"Campus estratégico", siteKindEn:"Strategic Campus",
+    site:"SINGAPUR", siteSub:"Tuas Tech & Energy Campus", siteSubEn:"Tuas Tech & Energy Campus",
+    focus:["Manufactura Avanzada","Energía Geotérmica","Centros de Datos","Tecnología y Automatización","Formación y Entrenamiento"],
+    focusEn:["Advanced Manufacturing","Geothermal Energy","Data Centers","Technology & Automation","Education & Training"],
+    lonlat:[103.8,1.35] },
+  { id:"af", n:5, name:"JV Africa", cls:"B", clsName:"Regional Development JV", color:"#9070b8", lightColor:"#c3aedb",
+    countries:"África del Norte, África Subsahariana", countriesEn:"North Africa, Sub-Saharan Africa",
+    siteKind:"Centro tecnológico", siteKindEn:"Technology Center",
+    site:"KENIA", siteSub:"Nairobi Green Tech Hub", siteSubEn:"Nairobi Green Tech Hub",
+    focus:["Energía Geotérmica","Infraestructura","Minería","Desarrollo de Proyectos","Formación Técnica"],
+    focusEn:["Geothermal Energy","Infrastructure","Mining","Project Development","Technical Training"],
+    lonlat:[36.82,-1.29] },
+  { id:"me", n:6, name:"JV Middle East", cls:"B", clsName:"Regional Development JV", color:"#e0682a", lightColor:"#efb190",
+    countries:"Golfo Pérsico, Turquía, Israel, Países del Levante", countriesEn:"Persian Gulf, Turkey, Israel, Levant Countries",
+    siteKind:"Centro tecnológico", siteKindEn:"Technology Center",
+    site:"ABU DHABI, EAU", siteSub:"Masdar Innovation Hub", siteSubEn:"Masdar Innovation Hub",
+    focus:["Energía","Desalación","Petróleo & Gas","Infraestructura","Centros de Datos"],
+    focusEn:["Energy","Desalination","Oil & Gas","Infrastructure","Data Centers"],
+    lonlat:[54.37,24.45] }
+];
+const BY_ID = Object.fromEntries(REGIONS.map(r=>[r.id,r]));
+
+const LISTS = {
+  na:["United States of America","Canada","Greenland"],
+  latam:["Mexico","Guatemala","Belize","Honduras","El Salvador","Nicaragua","Costa Rica","Panama","Cuba","Haiti","Dominican Rep.","Jamaica","Puerto Rico","Trinidad and Tobago","Bahamas","Colombia","Venezuela","Ecuador","Peru","Bolivia","Brazil","Chile","Argentina","Paraguay","Uruguay","Guyana","Suriname"],
+  eu:["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herz.","Bulgaria","Croatia","Cyprus","N. Cyprus","Czechia","Czech Rep.","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Lithuania","Luxembourg","Malta","Moldova","Montenegro","Netherlands","Macedonia","North Macedonia","Norway","Poland","Portugal","Romania","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"],
+  me:["Turkey","Israel","Palestine","Lebanon","Jordan","Syria","Iraq","Iran","Saudi Arabia","Yemen","Oman","United Arab Emirates","Qatar","Bahrain","Kuwait"]
+};
+const NAME2REGION = {};
+for (const [rid,names] of Object.entries(LISTS)) names.forEach(n=>NAME2REGION[n]=rid);
+
+const MAP_TRANS = {
+  es: {
+    kicker: "Ecosistema global de energía y tecnología",
+    title: "Mapa global de Joint Ventures",
+    titleSub: "Seis joint ventures regionales, cuatro campus estratégicos y dos centros tecnológicos.",
+    statJVs: "Joint ventures regionales",
+    statCampus: "Campus estratégicos",
+    statCenters: "Centros tecnológicos",
+    statCountries: "Países cubiertos",
+    style: "Estilo",
+    t_claro: "Claro",
+    searchPlaceholder: "Buscar país, JV o sede (p. ej. Irlanda, Singapur)",
+    backBtn: "← Volver",
+    directory: "Directorio",
+    jvFile: "Ficha de la JV",
+    noResults: "Sin resultados para “{q}”.",
+    countriesLabel: "Países",
+    focusLabel: "Enfoque",
+    regionalJv: "Joint venture regional 0",
+    contactJv: "Contactar con esta JV",
+    noCoverage: "Sin cobertura asignada",
+    geometry: "Geometría: Natural Earth · world-atlas",
+    energyFuture: "Energía que transforma el futuro",
+    countriesMap: { "United States of America":"Estados Unidos","Canada":"Canadá","Mexico":"México","Brazil":"Brasil","Ireland":"Irlanda","Spain":"España","France":"Francia","Germany":"Alemania","Italy":"Italia","United Kingdom":"Reino Unido","Kenya":"Kenia","Singapore":"Singapur","United Arab Emirates":"Emiratos Árabes Unidos","Saudi Arabia":"Arabia Saudí","Turkey":"Turquía","Japan":"Japón","India":"India","China":"China","Australia":"Australia","New Zealand":"Nueva Zelanda","South Africa":"Sudáfrica","Egypt":"Egipto","Morocco":"Marruecos","Nigeria":"Nigeria","Costa Rica":"Costa Rica","Chile":"Chile","Argentina":"Argentina","Colombia":"Colombia","Peru":"Perú" }
+  },
+  en: {
+    kicker: "Global energy and technology ecosystem",
+    title: "Global Joint Ventures Map",
+    titleSub: "Six regional joint ventures, four strategic campuses, and two technology centers.",
+    statJVs: "Regional joint ventures",
+    statCampus: "Strategic campuses",
+    statCenters: "Technology centers",
+    statCountries: "Countries covered",
+    style: "Style",
+    t_claro: "Light",
+    searchPlaceholder: "Search country, JV or site (e.g. Ireland, Singapore)",
+    backBtn: "← Back",
+    directory: "Directory",
+    jvFile: "JV Details",
+    noResults: "No results for “{q}”.",
+    countriesLabel: "Countries",
+    focusLabel: "Focus",
+    regionalJv: "Regional Joint Venture 0",
+    contactJv: "Contact this JV",
+    noCoverage: "No assigned coverage",
+    geometry: "Geometry: Natural Earth · world-atlas",
+    energyFuture: "Energy that transforms the future",
+    countriesMap: {}
+  }
+};
+
+let lang = "es";
+const esName = n => (MAP_TRANS[lang].countriesMap && MAP_TRANS[lang].countriesMap[n]) || n;
+
+function regionFor(name, c){
+  if (NAME2REGION[name]) return NAME2REGION[name];
+  if (name === "Russia" || name === "Antarctica" || name === "Fr. S. Antarctic Lands") return null;
+  const [lon,lat] = c;
+  if (lon > -20 && lon < 52 && lat > -36 && lat < 38) return "af";
+  if (lon >= 52 || lon < -140 || (lon > 60 && lat < 40)) return "apac";
+  if (lat < -10 && lon > 100) return "apac";
+  if (lon > 40) return "apac";
+  return null;
+}
+
+const svg = d3.select("#map");
+const projection = d3.geoNaturalEarth1().fitExtent([[10,14],[950,486]], {type:"Sphere"});
+const path = d3.geoPath(projection);
+const gGrid = svg.append("g");
+const gCountries = svg.append("g");
+const gArcs = svg.append("g");
+const gMarkers = svg.append("g");
+const graticule = d3.geoGraticule().step([20,20]);
+gGrid.append("path").attr("class","sphere").attr("d", path({type:"Sphere"}));
+gGrid.append("path").attr("class","grat").attr("d", path(graticule()));
+const gDeco = svg.append("g").attr("class","deco");
+(function frame(){
+  const marks = [-60,-30,0,30,60];
+  marks.forEach(lat=>{
+    const y = projection([0,lat])[1];
+    gDeco.append("line").attr("x1",10).attr("x2",22).attr("y1",y).attr("y2",y);
+    gDeco.append("line").attr("x1",938).attr("x2",950).attr("y1",y).attr("y2",y);
+    gDeco.append("text").attr("x",26).attr("y",y+2.5).text((lat>0?"N":lat<0?"S":"EQ")+(lat?Math.abs(lat)+"°":""));
+  });
+  [-120,-60,0,60,120].forEach(lon=>{
+    const x = projection([lon,0])[0];
+    gDeco.append("line").attr("x1",x).attr("x2",x).attr("y1",486).attr("y2",496);
+    gDeco.append("text").attr("x",x+4).attr("y",495).text((lon<0?"W":lon>0?"E":"0")+(lon?Math.abs(lon)+"°":""));
+  });
+})();
+const pop = document.getElementById("pop");
+const mapbox = document.getElementById("mapbox");
+
+let features = [], selected = null, filter = null, query = "";
+const TOUCH = window.matchMedia("(pointer:coarse)").matches;
+
+function palette(rid){
+  const r = BY_ID[rid];
+  if (!r) return null;
+  return document.body.dataset.theme === "claro" ? r.lightColor : r.color;
+}
+function isInk(){ return document.body.dataset.theme === "tinta"; }
+
+function fillFor(d){
+  const rid = d.properties.region;
+  if (!rid) return getComputedStyle(document.body).getPropertyValue("--nodata").trim();
+  if (isInk()) {
+    const active = (!filter || filter === rid) && (!selected || selected.id === rid);
+    return active ? BY_ID[rid].color : "#3a3a3a";
+  }
+  return palette(rid);
+}
+
+function paint(){
+  gCountries.selectAll("path.country")
+    .attr("fill", fillFor)
+    .classed("muted", d => !d.properties.region)
+    .classed("dim", d => d.properties.region && filter && filter !== d.properties.region);
+  gMarkers.selectAll("g.marker")
+    .attr("opacity", d => filter && filter !== d.id ? .3 : 1);
+  gMarkers.selectAll("circle.core").attr("fill", d => isInk() ? d.color : palette(d.id));
+  gMarkers.selectAll("circle.ring").attr("stroke", d => isInk() ? d.color : palette(d.id));
+  gMarkers.selectAll("circle.badge").attr("fill", d => isInk() ? d.color : palette(d.id));
+  gMarkers.selectAll("circle.ico rect").attr("color", d => isInk() ? d.color : palette(d.id));
+  gMarkers.selectAll("g.ico").attr("color", d => isInk() ? d.color : palette(d.id));
+  gMarkers.selectAll("circle.halo").attr("stroke", d => isInk() ? d.color : palette(d.id));
+  document.querySelectorAll(".chip").forEach(c=>{
+    c.style.color = c.dataset.r === filter ? palette(c.dataset.r) : "";
+    c.setAttribute("aria-pressed", c.dataset.r === filter);
+  });
+}
+
+function showPop(x,y,kicker,title,sub){
+  pop.innerHTML = `<div class="r">${kicker}</div><div class="t">${title}</div>${sub?`<div class="s">${sub}</div>`:""}`;
+  const w = mapbox.getBoundingClientRect().width;
+  pop.style.left = Math.max(78, Math.min(w-78, x))+"px";
+  pop.style.top = Math.max(58, y-14)+"px";
+  pop.classList.add("on");
+}
+const hidePop = () => pop.classList.remove("on");
+
+function svgToBox(sx,sy){
+  const rect = mapbox.getBoundingClientRect();
+  return [sx/960*rect.width, sy/500*rect.height];
+}
+
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json").then(topo=>{
+  features = topojson.feature(topo, topo.objects.countries).features;
+  features.forEach(f=>{
+    f.properties.region = regionFor(f.properties.name, d3.geoCentroid(f));
+  });
+
+  gCountries.selectAll("path.country").data(features).join("path")
+    .attr("class","country").attr("d", path)
+    .on("mousemove", (ev,d)=>{
+      if (TOUCH || !d.properties.region) { hidePop(); return; }
+      const r = BY_ID[d.properties.region];
+      const [cx,cy] = path.centroid(d);
+      const [x,y] = svgToBox(cx,cy);
+      showPop(x,y,`0${r.n} · ${lang === 'en' ? r.clsName : r.cls}`,esName(d.properties.name),r.name);
+      d3.select(ev.currentTarget).attr("fill-opacity",.72);
+    })
+    .on("mouseleave",(ev)=>{ hidePop(); d3.select(ev.currentTarget).attr("fill-opacity",null); })
+    .on("click",(ev,d)=>{ if (d.properties.region) select(d.properties.region); });
+
+  const marks = gMarkers.selectAll("g.marker").data(REGIONS).join("g")
+    .attr("class","marker")
+    .attr("transform", d => `translate(${projection(d.lonlat).map(v=>v.toFixed(1)).join(",")})`)
+    .on("mouseenter",(ev,d)=>{
+      const [x,y] = svgToBox(...projection(d.lonlat));
+      showPop(x,y-10,lang === 'en' ? d.siteKindEn : d.siteKind,d.site,lang === 'en' ? d.siteSubEn : d.siteSub);
+    })
+    .on("mouseleave",hidePop)
+    .on("click",(ev,d)=>select(d.id));
+  marks.append("circle").attr("class","ring").attr("r",15.5);
+  marks.append("circle").attr("class","core").attr("r",11);
+  const ico = marks.append("g").attr("class","ico").attr("transform","translate(-5.5,-6)");
+  // campus = torre ancha de 2 cuerpos; centro tecnológico = torre alta
+  ico.each(function(d){
+    const g = d3.select(this), tall = d.siteKind === "Centro tecnológico";
+    if (tall){
+      g.append("rect").attr("x",3).attr("y",0).attr("width",5).attr("height",12);
+      g.append("rect").attr("x",0).attr("y",4).attr("width",2.6).attr("height",8);
+      g.append("rect").attr("x",8.4).attr("y",4).attr("width",2.6).attr("height",8);
+      [2,5,8].forEach(y=>{ g.append("rect").attr("class","win").attr("x",4.2).attr("y",y).attr("width",2.6).attr("height",1.2); });
+    } else {
+      g.append("rect").attr("x",0).attr("y",3).attr("width",11).attr("height",9);
+      g.append("rect").attr("x",2.5).attr("y",0).attr("width",6).attr("height",2.2);
+      [5,8].forEach(y=>{ [1.6,4.6,7.6].forEach(x=>{ g.append("rect").attr("class","win").attr("x",x).attr("y",y).attr("width",1.8).attr("height",1.6); }); });
+    }
+  });
+  marks.append("circle").attr("class","badge").attr("cx",10.5).attr("cy",-10.5).attr("r",5.4).attr("stroke","#fff");
+  marks.append("text").attr("class","num").attr("x",10.5).attr("y",-10.4).text(d=>d.n);
+
+  const links = [["na","eu"],["na","latam"],["eu","me"],["me","af"],["me","apac"],["eu","apac"],["latam","af"]];
+  gArcs.selectAll("path.arc").data(links).join("path").attr("class","arc")
+    .attr("d", ([a,b]) => path({type:"LineString", coordinates:[BY_ID[a].lonlat, BY_ID[b].lonlat]}));
+  marks.insert("circle",":first-child").attr("class","halo").attr("r",13);
+  buildChips(); buildLegend(); buildList(); paint();
+});
+
+/* ---------- chips + legend ---------- */
+function buildChips(){
+  const c = document.getElementById("chips");
+  c.innerHTML = REGIONS.map(r=>
+    `<button class="chip" data-r="${r.id}" aria-pressed="false"><span class="dot"></span>${r.name.replace("JV ","")}</button>`).join("");
+  c.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+    filter = filter === b.dataset.r ? null : b.dataset.r;
+    buildList(); paint();
+  });
+}
+function buildLegend(){
+  document.getElementById("legend").innerHTML =
+    REGIONS.map(r=>`<span><i style="background:${palette(r.id)}"></i>${r.n} · ${r.name}</span>`).join("") +
+    `<span><i style="background:var(--nodata)"></i>${MAP_TRANS[lang].noCoverage}</span>`;
+}
+
+/* ---------- directory ---------- */
+function buildList(){
+  const q = query.trim().toLowerCase();
+  const list = document.getElementById("list");
+  let rows = REGIONS.filter(r=>!filter || filter===r.id);
+  if (q) rows = rows.filter(r =>
+    (r.name+" "+(lang === 'en' ? r.countriesEn : r.countries)+" "+r.site+" "+(lang === 'en' ? r.siteSubEn : r.siteSub)+" "+(lang === 'en' ? r.focusEn : r.focus).join(" ")).toLowerCase().includes(q));
+  let countryHits = [];
+  if (q) countryHits = features.filter(f=>f.properties.region &&
+      (esName(f.properties.name).toLowerCase().includes(q) || f.properties.name.toLowerCase().includes(q)))
+    .filter(f=>!filter || filter===f.properties.region).slice(0,8);
+
+  list.innerHTML = rows.map(r=>`
+    <button class="item" data-r="${r.id}">
+      <div class="nm" style="color:${palette(r.id)}"><em><b>${r.n}</b></em><span style="color:var(--fg)">${r.name}</span></div>
+      <div class="sb">${lang === 'en' ? r.siteKindEn : r.siteKind}: ${r.site} · ${lang === 'en' ? r.countriesEn : r.countries}</div>
+    </button>`).join("")
+    + (countryHits.length ? `<div class="sb" style="padding:12px 14px 4px;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase">${lang === 'en' ? 'Countries' : 'Países'}</div>` : "")
+    + countryHits.map(f=>{
+        const r = BY_ID[f.properties.region];
+        return `<button class="item" data-r="${r.id}">
+          <div class="nm"><span style="width:9px;height:9px;border-radius:50%;background:${palette(r.id)};display:block"></span>${esName(f.properties.name)}</div>
+          <div class="sb">${r.name}</div></button>`;
+      }).join("")
+    + (rows.length===0 && countryHits.length===0 ? `<div class="sb" style="padding:16px 14px">${MAP_TRANS[lang].noResults.replace("{q}", q)}</div>` : "");
+
+  list.querySelectorAll(".item").forEach(b=>b.onclick=()=>select(b.dataset.r));
+  document.getElementById("list").hidden = false;
+  document.getElementById("detail").hidden = true;
+  document.getElementById("back").hidden = true;
+  document.querySelector("#sideTitle span").textContent = filter ? BY_ID[filter].name : MAP_TRANS[lang].directory;
+}
+
+function select(rid){
+  selected = BY_ID[rid];
+  const r = selected;
+  document.getElementById("detail").innerHTML = `
+    <span class="tag" style="background:${r.color}">${r.cls} · ${lang === 'en' ? r.clsName : r.clsName}</span>
+    <h3>${r.name}</h3>
+    <p class="cls">${MAP_TRANS[lang].regionalJv}${r.n}</p>
+    <div class="block"><h4>${MAP_TRANS[lang].countriesLabel}</h4><p>${lang === 'en' ? r.countriesEn : r.countries}</p></div>
+    <div class="block"><h4>${lang === 'en' ? r.siteKindEn : r.siteKind}</h4><p class="site">${r.site}</p><p style="color:var(--dim);font-size:13px">${lang === 'en' ? r.siteSubEn : r.siteSub}</p></div>
+    <div class="block"><h4>${MAP_TRANS[lang].focusLabel}</h4><ul>${(lang === 'en' ? r.focusEn : r.focus).map(f=>`<li>${f}</li>`).join("")}</ul></div>
+    <a class="cta" href="javascript:void(0)" onclick="parent.postMessage({ action: 'scrollToContact', jvName: selected.name }, '*')">${MAP_TRANS[lang].contactJv}</a>`;
+  document.getElementById("detail").hidden = false;
+  document.getElementById("list").hidden = true;
+  document.getElementById("back").hidden = false;
+  document.querySelector("#sideTitle span").textContent = MAP_TRANS[lang].jvFile;
+  filter = rid; paint();
+}
+document.getElementById("back").onclick = ()=>{ selected=null; filter=null; buildList(); paint(); };
+document.getElementById("q").oninput = e => { query = e.target.value; selected=null; buildList(); paint(); };
+
+addEventListener("resize", hidePop, {passive:true});
+
+/* ---------- themes ---------- */
+document.querySelectorAll(".tbtn").forEach(b=>b.onclick=()=>{
+  document.body.dataset.theme = b.dataset.t;
+  document.querySelectorAll(".tbtn").forEach(x=>x.setAttribute("aria-pressed", x===b));
+  buildLegend(); if (!selected) buildList(); paint();
+});
+
+function translateMap(l) {
+  lang = l;
+  const trans = MAP_TRANS[lang];
+  document.querySelector(".kicker").textContent = trans.kicker;
+  document.querySelector("h1").innerHTML = `${trans.title}<span>${trans.titleSub}</span>`;
+  
+  const statElements = document.querySelectorAll(".stat s");
+  if (statElements.length >= 4) {
+    statElements[0].textContent = trans.statJVs;
+    statElements[1].textContent = trans.statCampus;
+    statElements[2].textContent = trans.statCenters;
+    statElements[3].textContent = trans.statCountries;
+  }
+  
+  document.querySelector(".themes b").textContent = trans.style;
+  document.querySelector('.tbtn[data-t="claro"]').textContent = trans.t_claro;
+  document.getElementById("q").placeholder = trans.searchPlaceholder;
+  document.getElementById("back").textContent = trans.backBtn;
+  
+  const footerSpanElements = document.querySelectorAll("footer span");
+  if (footerSpanElements.length >= 2) {
+    footerSpanElements[0].textContent = trans.geometry;
+    footerSpanElements[1].textContent = trans.energyFuture;
+  }
+  
+  buildLegend();
+  if (selected) {
+    select(selected.id);
+  } else {
+    buildList();
+  }
+}
+
+window.addEventListener("message", (e) => {
+  if (e.data) {
+    if (e.data.theme) {
+      const mapTheme = e.data.theme === "light" ? "claro" : "magma";
+      document.body.dataset.theme = mapTheme;
+      document.querySelectorAll(".tbtn").forEach(x => {
+        x.setAttribute("aria-pressed", x.dataset.t === mapTheme);
+      });
+      buildLegend(); if (!selected) buildList(); paint();
+    }
+    if (e.data.lang) {
+      translateMap(e.data.lang);
+    }
+  }
+});
+</script>
+
+<script>
+  const postHeight = () => {
+    const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+    parent.postMessage({ magmaMapHeight: height }, "*");
+  };
+  window.addEventListener("load", postHeight);
+  window.addEventListener("resize", postHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(postHeight).observe(document.body);
+  }
+</script>
+</body>
+
+</html>
