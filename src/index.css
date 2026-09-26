@@ -1814,3 +1814,140 @@ strong {
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+
+/* ==========================================================================
+   FORM DESIGN SYSTEM (BEM) - Premium UI & Form Controls
+   ========================================================================== */
+.mpp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.mpp-form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mpp-form-required {
+  color: var(--color-magma);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.mpp-form-input,
+.mpp-form-select,
+.mpp-form-textarea {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-md);
+  background-color: rgba(13, 18, 28, 0.8);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.mpp-form-input::placeholder,
+.mpp-form-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.75;
+}
+
+.mpp-form-input:hover,
+.mpp-form-select:hover,
+.mpp-form-textarea:hover {
+  border-color: rgba(255, 93, 2, 0.35);
+  background-color: rgba(18, 24, 38, 0.9);
+}
+
+.mpp-form-input:focus,
+.mpp-form-select:focus,
+.mpp-form-textarea:focus,
+.mpp-form-input:focus-visible,
+.mpp-form-select:focus-visible,
+.mpp-form-textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-magma);
+  box-shadow: 0 0 0 3px rgba(255, 93, 2, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: rgba(20, 28, 44, 0.95);
+}
+
+/* Custom Dropdown Arrow for Select */
+.mpp-form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ff5d02'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.1rem;
+  padding-right: 2.75rem;
+  cursor: pointer;
+}
+
+.mpp-form-select option {
+  background-color: #0b111e;
+  color: #f8fafc;
+  padding: 0.75rem;
+}
+
+/* Custom Textarea */
+.mpp-form-textarea {
+  min-height: 130px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Contact Card Styling */
+.mpp-contact-card {
+  padding: 2.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-card);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--box-shadow);
+}
+
+/* Light Mode Overrides for Form Controls */
+html[data-theme='light'] .mpp-form-input,
+html[data-theme='light'] .mpp-form-select,
+html[data-theme='light'] .mpp-form-textarea {
+  background-color: #ffffff;
+  border-color: rgba(15, 23, 42, 0.18);
+  color: #0f172a;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+html[data-theme='light'] .mpp-form-input:hover,
+html[data-theme='light'] .mpp-form-select:hover,
+html[data-theme='light'] .mpp-form-textarea:hover {
+  border-color: rgba(234, 88, 12, 0.45);
+  background-color: #ffffff;
+}
+
+html[data-theme='light'] .mpp-form-input:focus,
+html[data-theme='light'] .mpp-form-select:focus,
+html[data-theme='light'] .mpp-form-textarea:focus {
+  border-color: var(--color-magma);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2);
+  background-color: #ffffff;
+}
+
+html[data-theme='light'] .mpp-form-select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+

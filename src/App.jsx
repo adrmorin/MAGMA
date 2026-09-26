@@ -26,7 +26,10 @@ import {
   Briefcase,
   Users,
   Compass,
-  Building
+  Building,
+  User,
+  MessageSquare,
+  Send
 } from 'lucide-react';
 
 const getAssetUrl = (path) => {
@@ -1089,21 +1092,29 @@ export default function App() {
                   <form onSubmit={handleContactSubmit}>
                     <div className="grid mpp-grid-2 gap-4">
                       <div className="mpp-form-group">
-                        <label className="mpp-form-label">{t('contact_label_first')}</label>
+                        <label className="mpp-form-label">
+                          <User size={16} className="color-magma" />
+                          {t('contact_label_first')} <span className="mpp-form-required">*</span>
+                        </label>
                         <input 
                           type="text" 
                           className="mpp-form-input" 
                           required 
+                          placeholder="Juan"
                           value={contactForm.firstName}
                           onChange={(e) => setContactForm({...contactForm, firstName: e.target.value})}
                         />
                       </div>
                       <div className="mpp-form-group">
-                        <label className="mpp-form-label">{t('contact_label_last')}</label>
+                        <label className="mpp-form-label">
+                          <User size={16} className="color-magma" />
+                          {t('contact_label_last')} <span className="mpp-form-required">*</span>
+                        </label>
                         <input 
                           type="text" 
                           className="mpp-form-input" 
                           required 
+                          placeholder="Pérez"
                           value={contactForm.lastName}
                           onChange={(e) => setContactForm({...contactForm, lastName: e.target.value})}
                         />
@@ -1111,7 +1122,10 @@ export default function App() {
                     </div>
 
                     <div className="mpp-form-group">
-                      <label className="mpp-form-label">{t('scheduler_label_email')}</label>
+                      <label className="mpp-form-label">
+                        <Mail size={16} className="color-forest" />
+                        {t('scheduler_label_email')} <span className="mpp-form-required">*</span>
+                      </label>
                       <input 
                         type="email" 
                         className="mpp-form-input" 
@@ -1123,7 +1137,10 @@ export default function App() {
                     </div>
 
                     <div className="mpp-form-group">
-                      <label className="mpp-form-label">{t('contact_label_area')}</label>
+                      <label className="mpp-form-label">
+                        <Building size={16} className="color-electric" />
+                        {t('contact_label_area')} <span className="mpp-form-required">*</span>
+                      </label>
                       <select 
                         className="mpp-form-select"
                         value={contactForm.area}
@@ -1137,7 +1154,10 @@ export default function App() {
                     </div>
 
                     <div className="mpp-form-group">
-                      <label className="mpp-form-label">{t('contact_label_message')}</label>
+                      <label className="mpp-form-label">
+                        <MessageSquare size={16} className="color-grey" />
+                        {t('contact_label_message')}
+                      </label>
                       <textarea 
                         rows="4" 
                         className="mpp-form-textarea" 
@@ -1148,7 +1168,7 @@ export default function App() {
                     </div>
 
                     <button type="submit" className="mpp-btn mpp-btn--primary w-full mt-2">
-                      {t('contact_btn_submit')}
+                      <Send size={18} /> {t('contact_btn_submit')}
                     </button>
                   </form>
                 )}
