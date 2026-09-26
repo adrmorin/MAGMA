@@ -229,7 +229,7 @@ strong {
   outline-offset: 4px;
 }
 
-/* --- Premium Background Glows --- */
+/* --- Premium Background Glows (GPU Accelerated) --- */
 .bg-glow-orange {
   position: fixed;
   top: -10%;
@@ -238,6 +238,7 @@ strong {
   aspect-ratio: 1;
   background: radial-gradient(circle, var(--color-magma-glow) 0%, rgba(0,0,0,0) 70%);
   filter: blur(60px);
+  transform: translateZ(0);
   pointer-events: none;
   z-index: -1;
 }
@@ -250,6 +251,7 @@ strong {
   aspect-ratio: 1;
   background: radial-gradient(circle, var(--color-electric-glow) 0%, rgba(0,0,0,0) 70%);
   filter: blur(80px);
+  transform: translateZ(0);
   pointer-events: none;
   z-index: -1;
 }
@@ -262,8 +264,15 @@ strong {
   aspect-ratio: 1;
   background: radial-gradient(circle, var(--color-forest-glow) 0%, rgba(0,0,0,0) 70%);
   filter: blur(70px);
+  transform: translateZ(0);
   pointer-events: none;
   z-index: -1;
+}
+
+/* --- Section Performance Optimization --- */
+.mpp-section-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
 }
 
 /* --- Scrollbar Customization --- */

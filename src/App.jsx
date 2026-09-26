@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { translations } from './translations';
+import SistemaMagma from './SistemaMagma';
 import { 
   Sun, 
   Moon,
@@ -51,19 +52,21 @@ export default function App() {
 
   React.useEffect(() => {
     localStorage.setItem('magma-lang', lang);
-    const frame = document.getElementById("magma-map-frame");
-    if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage({ lang: lang }, "*");
-    }
+    document.querySelectorAll("iframe").forEach(frame => {
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage({ lang: lang }, "*");
+      }
+    });
   }, [lang]);
 
   const toggleLang = () => {
     const newLang = lang === 'es' ? 'en' : 'es';
     setLang(newLang);
-    const frame = document.getElementById("magma-map-frame");
-    if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage({ lang: newLang }, "*");
-    }
+    document.querySelectorAll("iframe").forEach(frame => {
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage({ lang: newLang }, "*");
+      }
+    });
   };
 
   const t = (key) => {
@@ -367,7 +370,7 @@ export default function App() {
       <header className="mpp-header">
         <div className="container mpp-header__container">
           <div className="mpp-header__brand" onClick={() => navigateTo('inicio')}>
-            <img src={theme === 'dark' ? getAssetUrl('/logo-horizontal-white.png') : getAssetUrl('/logo-horizontal-color.png')} alt="MAGMA POWER PLANT" className="mpp-header__logo" />
+            <img src={theme === 'dark' ? getAssetUrl('/logo-horizontal-white.png') : getAssetUrl('/logo-horizontal-color.png')} alt="MAGMA POWER PLANT" className="mpp-header__logo" width="240" height="90" fetchpriority="high" decoding="async" />
           </div>
 
           {/* Desktop Nav */}
@@ -442,7 +445,7 @@ export default function App() {
 
                 <div className="mpp-hero__image-wrapper">
                   <div className="mpp-hero__image-card">
-                    <img src={getAssetUrl('/logo-3d-transparent.png')} alt="Magma Power Plant 3D Logo" className="mpp-hero__logo-3d" />
+                    <img src={getAssetUrl('/logo-3d-transparent.png')} alt="Magma Power Plant 3D Logo" className="mpp-hero__logo-3d" width="360" height="360" fetchpriority="high" decoding="async" />
                     <div className="mpp-hero__badge">
                       <ShieldCheck size={20} className="color-forest" />
                       <span>{t('hero_badge')}</span>
@@ -450,6 +453,18 @@ export default function App() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Interactive 3D Model Section on Home */}
+            <div className="container section animate-fade">
+              <div className="mpp-section-header">
+                <span className="mpp-section-subtitle">VISUALIZACIÓN INTERACTIVA 3D</span>
+                <h2 className="mpp-section-title">Sistema de Proceso Geomagmático MAGMA</h2>
+                <p className="mpp-section-desc">
+                  Explore en tiempo real la arquitectura 3D del pozo profundo, intercambiadores de calor, turbogenerador MGT y corte geológico.
+                </p>
+              </div>
+              <SistemaMagma height="750px" lang={lang} />
             </div>
 
             {/* Impact section */}
@@ -516,7 +531,7 @@ export default function App() {
                 <p className="mt-4">
                   {t('company_intro_p2')}
                 </p>
-                 <img src={getAssetUrl('/geomagmatic-energy.png')} alt="Proceso de transferencia Geomagmática" className="mpp-compania-img mt-4" />
+                 <img src={getAssetUrl('/geomagmatic-energy.png')} alt="Proceso de transferencia Geomagmática" className="mpp-compania-img mt-4" loading="lazy" decoding="async" width="600" height="400" />
               </div>
               <div className="mpp-compania-intro__detail card-gradient-glow">
                 <h3>{t('company_science_title')}</h3>
@@ -623,6 +638,17 @@ export default function App() {
               <p className="mpp-section-desc">{t('tech_desc')}</p>
             </div>
 
+            {/* Visor 3D Interactivo del Proceso MAGMA */}
+            <div className="mpp-3d-model-section mb-8 animate-fade">
+              <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-heading, #ffffff)', margin: 0 }}>
+                  Modelo y Visor 3D Interactivo — Planta MAGMA
+                </h3>
+                <span className="mpp-hero__tag" style={{ margin: 0 }}>Texturizado PBR v17</span>
+              </div>
+              <SistemaMagma height="720px" lang={lang} />
+            </div>
+
             <div className="grid mpp-grid-2">
               <div className="mpp-tech-text-block">
                 <h3>{t('tech_system_title')}</h3>
@@ -638,7 +664,7 @@ export default function App() {
               </div>
               <div className="mpp-tech-visual-block">
                 <div className="mpp-tech-img-container">
-                   <img src={getAssetUrl('/orc-turbine.png')} alt="Turbogenerador ORC Magma" className="mpp-tech-main-img" />
+                   <img src={getAssetUrl('/orc-turbine.png')} alt="Turbogenerador ORC Magma" className="mpp-tech-main-img" loading="lazy" decoding="async" width="600" height="400" />
                 </div>
               </div>
             </div>
@@ -694,7 +720,7 @@ export default function App() {
             {/* Services Grid */}
             <div className="grid mpp-grid-2 mpp-services-list">
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src={getAssetUrl('/solar-plant.png')} alt="Plantas de Energía Solar" className="mpp-service-img" />
+                <img src={getAssetUrl('/solar-plant.png')} alt="Plantas de Energía Solar" className="mpp-service-img" loading="lazy" decoding="async" width="500" height="300" />
                 <div className="mpp-service-content">
                   <h3 className="color-magma">1. Plantas de Energía Solar</h3>
                   <p>
@@ -704,7 +730,7 @@ export default function App() {
               </div>
 
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src={getAssetUrl('/geothermal-plant.png')} alt="Proyectos de Energía Geotermal" className="mpp-service-img" />
+                <img src={getAssetUrl('/geothermal-plant.png')} alt="Proyectos de Energía Geotermal" className="mpp-service-img" loading="lazy" decoding="async" width="500" height="300" />
                 <div className="mpp-service-content">
                   <h3 className="color-forest">2. Proyectos de Energía Geotermal</h3>
                   <p>
@@ -714,7 +740,7 @@ export default function App() {
               </div>
 
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src={getAssetUrl('/geomagmatic-energy.png')} alt="Tecnologías Geomagmáticas R&D" className="mpp-service-img" />
+                <img src={getAssetUrl('/geomagmatic-energy.png')} alt="Tecnologías Geomagmáticas R&D" className="mpp-service-img" loading="lazy" decoding="async" width="500" height="300" />
                 <div className="mpp-service-content">
                   <h3 className="color-electric">3. Tecnologías Geomagmáticas R&D</h3>
                   <p>
@@ -724,7 +750,7 @@ export default function App() {
               </div>
 
               <div className="mpp-card mpp-service-card animate-fade">
-                <img src={getAssetUrl('/piping-layout.png')} alt="Diseño 3D Piping Inteligente" className="mpp-service-img" />
+                <img src={getAssetUrl('/piping-layout.png')} alt="Diseño 3D Piping Inteligente" className="mpp-service-img" loading="lazy" decoding="async" width="500" height="300" />
                 <div className="mpp-service-content">
                   <h3 className="color-grey">4. Diseño 3D Piping Inteligente</h3>
                   <p>
@@ -1178,7 +1204,7 @@ export default function App() {
       <footer className="mpp-footer">
         <div className="container mpp-footer__container">
           <div className="mpp-footer__left">
-            <img src={theme === 'dark' ? getAssetUrl('/logo-footer-dark.png') : getAssetUrl('/logo-footer-light.png')} alt="Logo Magma" className="mpp-footer__logo" />
+            <img src={theme === 'dark' ? getAssetUrl('/logo-footer-dark.png') : getAssetUrl('/logo-footer-light.png')} alt="Logo Magma" className="mpp-footer__logo" loading="lazy" decoding="async" width="180" height="60" />
             <p>{t('footer_desc')}</p>
           </div>
           <div className="mpp-footer__center">

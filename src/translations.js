@@ -226,7 +226,22 @@ export const translations = {
     footer_sections: "Secciones",
     footer_contact: "Contacto",
     footer_rights: "© {year} MAGMA POWER PLANT Inc. Todos los derechos reservados.",
-    footer_doc: "Documento L21000169244"
+    footer_doc: "Documento L21000169244",
+
+    // SistemaMagma Benefits
+    visor_benefits_title: "Beneficios Principales del Sistema MAGMA",
+    visor_benefits_sub: "Generación limpia y continua mediante circuito cerrado geotérmico",
+    visor_benefits_intro: "El sistema MAGMA busca aprovechar el calor del subsuelo para generar electricidad mediante un circuito cerrado. Sus principales beneficios potenciales son:",
+    visor_b1_title: "Generación continua",
+    visor_b1_desc: "Aprovechar un recurso térmico que no depende del sol ni del viento, siempre que el terreno aporte calor suficiente de forma sostenible.",
+    visor_b2_title: "Menor dependencia de combustibles",
+    visor_b2_desc: "Utilizar calor geotérmico como fuente de energía y reducir la necesidad de abastecimiento de combustibles.",
+    visor_b3_title: "Reutilización del fluido",
+    visor_b3_desc: "Recircular el fluido de trabajo para captar calor, generar energía y volver al pozo.",
+    visor_b4_title: "Aprovechamiento de un recurso local",
+    visor_b4_desc: "Acercar la producción energética a los lugares de consumo cuando las condiciones geológicas lo permitan.",
+    visor_b5_title: "Menor ocupación en superficie",
+    visor_b5_desc: "Concentrar la captación bajo tierra, con potencial para una instalación superficial compacta."
   },
   en: {
     // Navigation Links
@@ -455,6 +470,21 @@ export const translations = {
     footer_sections: "Sections",
     footer_contact: "Contact",
     footer_rights: "© {year} MAGMA POWER PLANT Inc. All rights reserved.",
-    footer_doc: "Document L21000169244"
+    footer_doc: "Document L21000169244",
+
+    // SistemaMagma Benefits
+    visor_benefits_title: "Main Benefits of the MAGMA System",
+    visor_benefits_sub: "Clean and continuous generation via closed-loop geothermal circuit",
+    visor_benefits_intro: "The MAGMA system aims to harness subsoil heat to generate electricity through a closed loop. Its main potential benefits are:",
+    visor_b1_title: "Continuous Generation",
+    visor_b1_desc: "Harness a thermal resource independent of solar or wind, provided the subsoil supplies sufficient heat sustainably.",
+    visor_b2_title: "Lower Fuel Dependency",
+    visor_b2_desc: "Use geothermal heat as an energy source and reduce the need for fuel supplies.",
+    visor_b3_title: "Fluid Recirculation",
+    visor_b3_desc: "Recirculate the working fluid to capture heat, generate power, and return to the borehole.",
+    visor_b4_title: "Local Resource Utilization",
+    visor_b4_desc: "Bring energy production closer to consumption sites when geological conditions allow.",
+    visor_b5_title: "Minimal Surface Footprint",
+    visor_b5_desc: "Concentrate heat extraction underground, with potential for a compact surface installation."
   }
 };
