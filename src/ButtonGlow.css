@@ -1,0 +1,164 @@
+/* ==========================================================================
+   ILUMINACIÓN DE BOTONES AL PASAR EL RATÓN
+   - Foco de luz que sigue al cursor (variables --mx / --my, ver useButtonGlow)
+   - Aura de calor (box-shadow) y destello que barre el botón (solo primarios)
+   - Enlaces de navegación: brillo del texto + filamento incandescente
+   BEM-lite sobre las clases existentes; hereda los tokens de index.css
+   ========================================================================== */
+
+:root {
+  --glow-rgb: 255, 120, 30;        /* naranja magma */
+  --glow-core-rgb: 255, 214, 140;  /* núcleo incandescente */
+  --glow-alpha: 1;
+}
+
+html[data-theme='light'] {
+  --glow-rgb: 234, 88, 12;
+  --glow-core-rgb: 255, 190, 110;
+  --glow-alpha: 0.75;
+}
+
+/* --- Base común: contenedor del foco de luz --- */
+:is(.mpp-btn, .mpp-nav-link, .mpp-nav-mobile-link, .mpp-theme-toggle, .mpp-lang-toggle, .mpp-slider-btn, .mpp-footer__links button) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --mx: 50%;
+  --my: 50%;
+}
+
+/* Foco de luz bajo el cursor */
+:is(.mpp-btn, .mpp-nav-link, .mpp-nav-mobile-link, .mpp-theme-toggle, .mpp-lang-toggle, .mpp-slider-btn, .mpp-footer__links button)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 7rem at var(--mx) var(--my),
+    rgba(var(--glow-core-rgb), calc(0.55 * var(--glow-alpha))),
+    rgba(var(--glow-rgb), calc(0.28 * var(--glow-alpha))) 45%,
+    transparent 75%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+:is(.mpp-btn, .mpp-nav-link, .mpp-nav-mobile-link, .mpp-theme-toggle, .mpp-lang-toggle, .mpp-slider-btn, .mpp-footer__links button):is(:hover, :focus-visible)::before {
+  opacity: 1;
+}
+
+/* --- Botón primario: aura de calor + destello que lo barre --- */
+.mpp-btn--primary {
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.mpp-btn--primary:is(:hover, :focus-visible) {
+  background: linear-gradient(135deg, #ff7a1f 0%, var(--color-magma) 55%, #e04200 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 190, 120, 0.55),
+    0 0 18px rgba(var(--glow-rgb), calc(0.65 * var(--glow-alpha))),
+    0 0 48px rgba(var(--glow-rgb), calc(0.35 * var(--glow-alpha))),
+    inset 0 0 14px rgba(255, 230, 180, 0.28);
+}
+
+/* Destello diagonal */
+.mpp-btn--primary::after {
+  content: '';
+  position: absolute;
+  inset-block: -20%;
+  inset-inline-start: -60%;
+  inline-size: 40%;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg) translateX(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mpp-btn--primary:is(:hover, :focus-visible)::after {
+  animation: btn-sheen 0.9s ease-out;
+}
+
+@keyframes btn-sheen {
+  0%   { opacity: 0;   transform: skewX(-20deg) translateX(0); }
+  25%  { opacity: 0.9; }
+  100% { opacity: 0;   transform: skewX(-20deg) translateX(480%); }
+}
+
+/* --- Botón secundario: borde y luz interior incandescentes --- */
+.mpp-btn--secondary:is(:hover, :focus-visible) {
+  border-color: rgba(var(--glow-rgb), 0.9);
+  color: var(--color-text-primary);
+  background: rgba(var(--glow-rgb), 0.06);
+  box-shadow:
+    0 0 14px rgba(var(--glow-rgb), calc(0.4 * var(--glow-alpha))),
+    inset 0 0 16px rgba(var(--glow-rgb), calc(0.18 * var(--glow-alpha)));
+}
+
+/* --- Navegación: texto que brilla + filamento inferior --- */
+.mpp-nav-link,
+.mpp-nav-mobile-link {
+  transition: color var(--transition-fast), text-shadow var(--transition-normal), background var(--transition-fast);
+}
+
+:is(.mpp-nav-link, .mpp-nav-mobile-link):is(:hover, :focus-visible) {
+  color: var(--color-magma);
+  text-shadow: 0 0 12px rgba(var(--glow-rgb), calc(0.85 * var(--glow-alpha)));
+}
+
+.mpp-nav-link::after {
+  content: '';
+  position: absolute;
+  inset-inline: 22%;
+  inset-block-end: 2px;
+  block-size: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgb(var(--glow-core-rgb)), transparent);
+  box-shadow: 0 0 10px rgba(var(--glow-rgb), 0.9);
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+}
+
+.mpp-nav-link:is(:hover, :focus-visible)::after,
+.mpp-nav-link--active::after {
+  transform: scaleX(1);
+}
+
+.mpp-nav-link--active::after {
+  opacity: 0.7;
+}
+
+/* --- Toggles circulares (tema / idioma) y botones del slider --- */
+:is(.mpp-theme-toggle, .mpp-lang-toggle, .mpp-slider-btn) {
+  transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-normal);
+}
+
+:is(.mpp-theme-toggle, .mpp-lang-toggle, .mpp-slider-btn):is(:hover, :focus-visible):not(:disabled) {
+  border-color: rgba(var(--glow-rgb), 0.85);
+  box-shadow:
+    0 0 14px rgba(var(--glow-rgb), calc(0.55 * var(--glow-alpha))),
+    inset 0 0 10px rgba(var(--glow-rgb), calc(0.2 * var(--glow-alpha)));
+}
+
+/* Enlaces del pie */
+.mpp-footer__links button:is(:hover, :focus-visible) {
+  color: var(--color-magma);
+  text-shadow: 0 0 10px rgba(var(--glow-rgb), calc(0.7 * var(--glow-alpha)));
+}
+
+/* --- Accesibilidad: sin barrido animado; el brillo estático se mantiene --- */
+@media (prefers-reduced-motion: reduce) {
+  .mpp-btn--primary:is(:hover, :focus-visible)::after {
+    animation: none;
+  }
+
+  :is(.mpp-btn, .mpp-nav-link, .mpp-nav-mobile-link, .mpp-theme-toggle, .mpp-lang-toggle, .mpp-slider-btn)::before,
+  .mpp-nav-link::after {
+    transition: none;
+  }
+}

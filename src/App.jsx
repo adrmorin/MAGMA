@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { translations } from './translations';
 import SistemaMagma from './SistemaMagma';
+import AnimatedBackground from './AnimatedBackground';
+import useButtonGlow from './useButtonGlow';
+import './ButtonGlow.css';
 import { 
   Sun, 
   Moon,
@@ -29,7 +32,9 @@ import {
   Building,
   User,
   MessageSquare,
-  Send
+  Send,
+  Globe,
+  Activity
 } from 'lucide-react';
 
 const getAssetUrl = (path) => {
@@ -39,6 +44,9 @@ const getAssetUrl = (path) => {
 };
 
 export default function App() {
+  // Iluminación de botones bajo el cursor
+  useButtonGlow();
+
   // Navigation State
   const [activeTab, setActiveTab] = useState('inicio');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -364,6 +372,8 @@ export default function App() {
 
   return (
     <div className="mpp-layout">
+      {/* Fondo vectorial animado */}
+      <AnimatedBackground />
       {/* Background Decorative Glows */}
       <div className="bg-glow-orange"></div>
       <div className="bg-glow-blue"></div>
@@ -384,6 +394,7 @@ export default function App() {
             <button className={`mpp-nav-link ${activeTab === 'servicios' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('servicios')}>{t('nav_servicios')}</button>
             <button className={`mpp-nav-link ${activeTab === 'equipo' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('equipo')}>{t('nav_equipo')}</button>
             <button className={`mpp-nav-link ${activeTab === 'franquicias' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('franquicias')}>{t('nav_franquicias')}</button>
+            <button className={`mpp-nav-link ${activeTab === 'mugara' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('mugara')}>{t('nav_mugara')}</button>
             <button className={`mpp-nav-link ${activeTab === 'contactos' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('contactos')}>{t('nav_contactos')}</button>
           </nav>
 
@@ -414,6 +425,7 @@ export default function App() {
             <button className={`mpp-nav-mobile-link ${activeTab === 'servicios' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('servicios')}>{t('nav_servicios')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'equipo' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('equipo')}>{t('nav_equipo')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'franquicias' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('franquicias')}>{t('nav_franquicias')}</button>
+            <button className={`mpp-nav-mobile-link ${activeTab === 'mugara' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('mugara')}>{t('nav_mugara')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'contactos' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('contactos')}>{t('nav_contactos')}</button>
           </nav>
         )}
@@ -1060,6 +1072,81 @@ export default function App() {
           </section>
         )}
 
+        {/* TAB: MUGARA */}
+        {activeTab === 'mugara' && (
+          <section className="container section animate-fade">
+            <div className="mpp-section-header">
+              <span className="mpp-section-subtitle">{t('mugara_subtitle')}</span>
+              <h2 className="mpp-section-title">{t('mugara_title')}</h2>
+              <p className="mpp-section-desc">{t('mugara_desc')}</p>
+            </div>
+
+            {/* Mapa global de activos (mapa D3 autónomo de MUGARA) */}
+            <div className="mb-8">
+              <h3 className="mpp-process-title">{t('mugara_map_title')}</h3>
+              <p className="mpp-process-subtitle">{t('mugara_map_desc')}</p>
+              <div style={{ width: '100%', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--color-border, #1e293b)', boxShadow: '0 12px 30px rgba(0,0,0,0.3)', background: '#080f1c', marginTop: '1rem' }}>
+                <iframe
+                  key={lang}
+                  src={getAssetUrl(`/mugara/mapa-activos.html?lang=${lang}`)}
+                  title={t('mugara_map_title')}
+                  style={{ width: '100%', height: 'min(900px, 120vw)', minHeight: '640px', border: 0, display: 'block' }}
+                  loading="lazy"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+
+            {/* Qué es MUGARA */}
+            <div className="mpp-section-header">
+              <h3 className="mpp-section-title">{t('mugara_about_title')}</h3>
+            </div>
+            <div className="grid mpp-grid-3">
+              <div className="mpp-card mpp-card--magma">
+                <div className="mpp-card__icon-container mpp-card__icon-container--magma"><ShieldCheck size={24} /></div>
+                <h3 className="mpp-card__title">{t('mugara_about1_title')}</h3>
+                <p className="mpp-card__text">{t('mugara_about1_text')}</p>
+              </div>
+              <div className="mpp-card mpp-card--forest">
+                <div className="mpp-card__icon-container mpp-card__icon-container--forest"><Globe size={24} /></div>
+                <h3 className="mpp-card__title">{t('mugara_about2_title')}</h3>
+                <p className="mpp-card__text">{t('mugara_about2_text')}</p>
+              </div>
+              <div className="mpp-card mpp-card--electric">
+                <div className="mpp-card__icon-container mpp-card__icon-container--electric"><Users size={24} /></div>
+                <h3 className="mpp-card__title">{t('mugara_about3_title')}</h3>
+                <p className="mpp-card__text">{t('mugara_about3_text')}</p>
+              </div>
+            </div>
+
+            {/* Metodología */}
+            <div className="mpp-section-header section">
+              <h3 className="mpp-section-title">{t('mugara_method_title')}</h3>
+              <p className="mpp-section-desc">{t('mugara_method_desc')}</p>
+            </div>
+            <div className="grid mpp-grid-3">
+              <div className="mpp-card">
+                <div className="mpp-card-mvh-header"><Database className="color-magma" size={24} /><h3>{t('mugara_method1_title')}</h3></div>
+                <p>{t('mugara_method1_text')}</p>
+              </div>
+              <div className="mpp-card">
+                <div className="mpp-card-mvh-header"><Cpu className="color-forest" size={24} /><h3>{t('mugara_method2_title')}</h3></div>
+                <p>{t('mugara_method2_text')}</p>
+              </div>
+              <div className="mpp-card">
+                <div className="mpp-card-mvh-header"><Activity className="color-electric" size={24} /><h3>{t('mugara_method3_title')}</h3></div>
+                <p>{t('mugara_method3_text')}</p>
+              </div>
+            </div>
+
+            <div className="mt-8" style={{ textAlign: 'center' }}>
+              <button className="mpp-btn mpp-btn--primary" onClick={() => navigateTo('contactos')}>
+                {t('mugara_cta')} <ArrowRight size={18} />
+              </button>
+            </div>
+          </section>
+        )}
+
         {/* TAB: CONTACTOS */}
         {activeTab === 'contactos' && (
           <section className="container section animate-fade">
@@ -1236,6 +1323,7 @@ export default function App() {
               <button onClick={() => navigateTo('servicios')}>{t('nav_servicios')}</button>
               <button onClick={() => navigateTo('equipo')}>{t('nav_equipo')}</button>
               <button onClick={() => navigateTo('franquicias')}>{t('nav_franquicias')}</button>
+              <button onClick={() => navigateTo('mugara')}>{t('nav_mugara')}</button>
               <button onClick={() => navigateTo('contactos')}>{t('nav_contactos')}</button>
             </div>
           </div>

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MUGARA — Mapa de activos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    background:var(--bg); color:var(--fg);
+    transition:background .35s ease,color .35s ease;
+  }
+  /* ---- themes ---- */
+  body[data-theme="magma"]{
+    --bg:#080f1c; --panel:#0e1a2c; --panel2:#122238; --fg:#e8eef6; --dim:#8ea3bd;
+    --line:#1e3450; --accent:#2fd6c8; --ocean:#0a1526; --nodata:#152437; --nodataLine:#22364f;
+    --shadow:0 18px 40px -24px #000;
+  }
+  body[data-theme="claro"]{
+    --bg:#f7f5f1; --panel:#fffefb; --panel2:#f1ede6; --fg:#1d1b18; --dim:#6f6a62;
+    --line:#e0dad0; --accent:#17b3a6; --ocean:#eeeae3; --nodata:#e6e1d9; --nodataLine:#d6cfc4;
+    --shadow:0 16px 36px -26px #6b6257;
+  }
+  body[data-theme="tinta"]{
+    --bg:#121212; --panel:#1a1a1a; --panel2:#222; --fg:#f2f0ec; --dim:#9a9691;
+    --line:#2e2e2e; --accent:#2fd6c8; --ocean:#151515; --nodata:#242424; --nodataLine:#333;
+    --shadow:0 18px 40px -26px #000;
+  }
+  .wrap{max-width:1440px;margin:0 auto;padding:24px}
+  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;
+    border-bottom:1px solid var(--line);padding-bottom:20px}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  h1{font-family:Archivo,sans-serif;font-weight:800;font-size:clamp(28px,4vw,44px);line-height:1.02;margin:0;letter-spacing:-.015em;text-transform:uppercase}
+  h1 span{display:block;font-weight:500;font-size:clamp(13px,1.4vw,17px);letter-spacing:.06em;color:var(--dim);text-transform:none;margin-top:10px}
+  .themes{display:flex;gap:8px;align-items:center}
+  .themes b{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:400;margin-right:4px}
+  .tbtn{font:500 12px/1 "IBM Plex Sans",sans-serif;padding:9px 13px;border-radius:999px;cursor:pointer;
+    background:transparent;color:var(--dim);border:1px solid var(--line)}
+  .tbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#08131f}
+  /* ---- stats ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);margin:24px 0 20px}
+  .stat{background:var(--panel);padding:16px 18px}
+  .stat i{display:block;font-family:Archivo,sans-serif;font-style:normal;font-weight:800;font-size:30px;line-height:1}
+  .stat s{display:block;text-decoration:none;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:8px}
+  /* ---- controls ---- */
+  .controls{position:absolute;top:14px;left:14px;z-index:6;max-width:calc(100% - 190px);transform-origin:top left}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:8px 13px;font:500 12px/1 "IBM Plex Sans",sans-serif;color:var(--dim)}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .chip,.legend span,.tbtn,.maptools button{transition:transform .2s ease,box-shadow .25s ease,filter .25s ease,border-color .25s ease}
+  .chip:hover,.chip:focus-visible,.tbtn:hover,.tbtn:focus-visible,.maptools button:hover,.maptools button:focus-visible{transform:translateY(-1px);border-color:currentColor;filter:brightness(1.15);box-shadow:0 0 0 2px color-mix(in srgb,currentColor 25%,transparent),0 0 16px color-mix(in srgb,currentColor 45%,transparent)}
+  .legend span:hover{transform:translateY(-1px);filter:drop-shadow(0 0 7px currentColor)}
+  .legend span:hover i{box-shadow:0 0 12px currentColor;transform:scale(1.18)}
+  .legend i{transition:transform .2s ease,box-shadow .25s ease}
+  .chip[aria-pressed="true"]{color:var(--fg);border-color:currentColor}
+  /* ---- layout ---- */
+  .mapbox{position:relative;background:var(--ocean);border:1px solid var(--line);overflow:hidden}
+  .mapbox:fullscreen,.mapbox:-webkit-full-screen{width:100vw;height:100vh;background:var(--ocean);border:none}
+  .mapbox:fullscreen svg.map,.mapbox:-webkit-full-screen svg.map{height:100%}
+  svg.map{display:block;width:100%;height:auto}
+  path.grat{fill:none;stroke:var(--nodataLine);stroke-width:.4;opacity:.55;pointer-events:none;vector-effect:non-scaling-stroke}
+  path.sphere{fill:none;stroke:var(--nodataLine);stroke-width:.9;opacity:.8;pointer-events:none;vector-effect:non-scaling-stroke}
+  g.deco{pointer-events:none}
+  g.deco line{stroke:var(--nodataLine);stroke-width:.7;opacity:.7}
+  g.deco text{font-family:"IBM Plex Mono",monospace;font-size:7px;letter-spacing:.14em;fill:var(--dim);opacity:.7}
+  path.country{stroke:var(--ocean);stroke-width:.4;cursor:default;transition:fill-opacity .18s ease;vector-effect:non-scaling-stroke}
+  path.country.has-assets{cursor:pointer}
+  path.country.muted{fill-opacity:.16}
+  path.country.dim{fill-opacity:.28}
+  .mapbox.lines-mode path.country{fill:none !important;stroke:var(--nodataLine);stroke-width:.8}
+  .asset-marker{cursor:pointer}
+  .asset-marker circle{stroke:var(--ocean);stroke-width:1;vector-effect:non-scaling-stroke}
+  .asset-marker.dim{opacity:.22}
+  .asset-marker.active circle{stroke:var(--fg);stroke-width:1.4}
+  .asset-marker__visual{transition:transform .18s ease;transform-box:fill-box;transform-origin:center}
+  .asset-marker:hover .asset-marker__visual{transform:scale(1.3)}
+  /* En pantalla completa el SVG se estira a toda la pantalla física, así
+     que los marcadores se ven mucho más grandes — se reducen 50% para
+     compensar. */
+  .mapbox:fullscreen .asset-marker__visual,
+  .mapbox:-webkit-full-screen .asset-marker__visual{transform:scale(.5)}
+  .mapbox:fullscreen .asset-marker:hover .asset-marker__visual,
+  .mapbox:-webkit-full-screen .asset-marker:hover .asset-marker__visual{transform:scale(.65)}
+  .asset-marker__ping{opacity:0;pointer-events:none;transform-box:fill-box;transform-origin:center;vector-effect:non-scaling-stroke}
+  .asset-marker:hover .asset-marker__ping{animation:energy-marker-ping 1.1s ease-out infinite}
+  @keyframes energy-marker-ping{
+    0%{transform:scale(1);opacity:.85}
+    100%{transform:scale(2.6);opacity:0}
+  }
+  /* Resplandor que sigue al mouse sobre el mapa, coloreado por tierra/mar */
+  .map-cursor-glow{
+    position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+    transition:opacity .25s ease;
+    background:radial-gradient(circle 220px at var(--cursor-x,50%) var(--cursor-y,50%),
+      color-mix(in srgb, var(--cursor-color, #4fd1e8) 38%, transparent), transparent 70%);
+  }
+  .map-cursor-glow.on{opacity:1}
+  .pop{position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-100%);
+    background:var(--panel2);border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:10px 12px;min-width:150px;transition:opacity .14s ease;z-index:5}
+  .pop.on{opacity:1}
+  .pop .r{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .pop .t{font-family:Archivo,sans-serif;font-weight:600;font-size:14px;margin-top:4px}
+  .pop .s{font-size:12px;color:var(--dim);margin-top:3px}
+  .chip-pop{position:fixed;pointer-events:none;opacity:0;transform:translate(-50%,-100%);
+    background:var(--panel2);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;
+    padding:10px 12px;min-width:180px;max-width:240px;transition:opacity .14s ease;z-index:50}
+  .chip-pop.on{opacity:1}
+  .chip-pop .r{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .chip-pop .t{font-family:Archivo,sans-serif;font-weight:600;font-size:14px;margin-top:4px}
+  .chip-pop .s{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.45}
+  .maptools{position:absolute;top:14px;right:14px;z-index:6;display:flex;gap:8px;transform-origin:top right}
+  .maptools button{font:500 11px/1 "IBM Plex Sans",sans-serif;padding:8px 12px;border-radius:8px;cursor:pointer;
+    background:var(--panel2);color:var(--fg);border:1px solid var(--line)}
+  .maptools button:hover{border-color:var(--accent)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 22px;padding:14px 16px;border-top:1px solid var(--line);background:var(--panel)}
+  .legend span{display:flex;align-items:center;gap:8px;font:400 11px/1 "IBM Plex Sans",sans-serif;color:var(--dim)}
+  .legend i{width:14px;height:14px;border-radius:50%;display:block}
+  a{color:var(--accent)}
+  a:hover{color:var(--fg)}
+  footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;
+    justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--dim)}
+  @media (max-width:980px){
+    header.top{align-items:flex-start}
+    .themes{width:100%}
+  }
+  @media (max-width:640px){
+    .wrap{padding:14px}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat{padding:13px 14px}
+    .stat i{font-size:24px}
+    .chips{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .chip{flex:none}
+    .legend{gap:9px 14px;padding:12px}
+    .legend span{font-size:10px}
+    .pop{min-width:130px;padding:8px 10px}
+    .pop .t{font-size:13px}
+    g.deco text{display:none}
+    footer{font-size:9px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none}
+  }
+</style>
+</head>
+<body data-theme="magma">
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">Global Energy Data</p>
+      <h1 id="map-title">Mapa de activos<span>49 plantas renovables de referencia a nivel mundial · coordenadas aproximadas, pendientes de validar contra Global Energy Monitor</span></h1>
+    </div>
+    <div class="themes">
+      <b id="theme-label">Tema</b>
+      <button class="tbtn" data-theme="magma" aria-pressed="true">Magma</button>
+      <button class="tbtn" data-theme="claro" aria-pressed="false">Claro</button>
+      <button class="tbtn" data-theme="tinta" aria-pressed="false">Tinta</button>
+    </div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="mapbox" id="mapbox">
+    <div class="map-cursor-glow" id="cursor-glow"></div>
+    <svg class="map" id="map" viewBox="0 0 960 500" role="img" aria-label="Mapa mundial de activos renovables MUGARA"></svg>
+    <div class="pop" id="pop"></div>
+    <div class="chip-pop" id="chip-pop"></div>
+    <div class="controls">
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="maptools">
+      <button type="button" id="zoom-reset">Vista completa</button>
+      <button type="button" id="lines-toggle">Líneas</button>
+      <button type="button" id="fullscreen-toggle">Pantalla completa</button>
+    </div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <footer>
+    <span id="footer-data">MUGARA — datos reales, coordenadas aproximadas</span>
+    <span id="footer-source">Países: Natural Earth 1:110m · Activos: muestra MUGARA 04_DATOS_GLOBALES</span>
+  </footer>
+</div>
+
+<script>
+const MAP_LANGUAGE = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "es";
+const MAP_ENGLISH = MAP_LANGUAGE === "en";
+document.documentElement.lang = MAP_LANGUAGE;
+if (MAP_ENGLISH) {
+  document.getElementById("map-title").innerHTML = "Asset map<span>49 benchmark renewable plants worldwide · approximate coordinates pending validation against Global Energy Monitor</span>";
+  document.getElementById("theme-label").textContent = "Theme";
+  document.querySelector('[data-theme="claro"]').textContent = "Light";
+  document.querySelector('[data-theme="tinta"]').textContent = "Ink";
+  document.getElementById("zoom-reset").textContent = "Full view";
+  document.getElementById("lines-toggle").textContent = "Lines";
+  document.getElementById("fullscreen-toggle").textContent = "Fullscreen";
+  document.getElementById("footer-data").textContent = "MUGARA — real data, approximate coordinates";
+  document.getElementById("footer-source").textContent = "Countries: Natural Earth 1:110m · Assets: MUGARA sample 04_DATOS_GLOBALES";
+  document.getElementById("map").setAttribute("aria-label", "World map of MUGARA renewable assets");
+}
+/**
+ * 49 activos reales de "Muestra_Base_Datos_Energias_Renovables.xlsx"
+ * (fuente MUGARA, 04_DATOS_GLOBALES): nombre, país, subtipo, región,
+ * capacidad MW, estado y fuente son los del archivo original.
+ *
+ * `lat`/`lng` NO vienen de ese archivo (solo trae país/región): son una
+ * aproximación geográfica añadida para poder dibujar el mapa, marcada
+ * como `coordsConfidence: "aproximada"` — pendiente de validar contra
+ * Global Energy Monitor, que sí publica coordenadas reales planta por
+ * planta. "Jichuan Solar Park" tiene `coordsConfidence: "sin_confirmar"`
+ * y `lat`/`lng` null porque la fuente ni siquiera confirma su región
+ * ("China, región no confirmada") — no se le inventa una coordenada, se
+ * lista aparte en vez de dibujarse.
+ */
+const ASSETS = [
+  { id: "solar-golmud", name: "Golmud Solar Park", technology: "solar", country: "China", subtype: "Fotovoltaica", region: "Qinghai, meseta tibetana", capacityMW: 2800, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 36.42, lng: 94.90, coordsConfidence: "aproximada" },
+  { id: "solar-bhadla", name: "Bhadla Solar Park", technology: "solar", country: "India", subtype: "Fotovoltaica", region: "Rajastán, desierto de Thar", capacityMW: 2700, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 27.535, lng: 71.915, coordsConfidence: "aproximada" },
+  { id: "solar-pavagada", name: "Pavagada Solar Park", technology: "solar", country: "India", subtype: "Fotovoltaica", region: "Karnataka", capacityMW: 2050, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 14.10, lng: 77.28, coordsConfidence: "aproximada" },
+  { id: "solar-benban", name: "Benban Solar Park", technology: "solar", country: "Egipto", subtype: "Fotovoltaica", region: "Asuán, alto Egipto", capacityMW: 1770, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 24.475, lng: 32.887, coordsConfidence: "aproximada" },
+  { id: "solar-mbr", name: "Mohammed Bin Rashid Al Maktoum Solar Park", technology: "solar", country: "Emiratos Árabes Unidos", subtype: "Fotovoltaica + CSP", region: "Dubái", capacityMW: 1630, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 24.760, lng: 55.475, coordsConfidence: "aproximada" },
+  { id: "solar-tengger", name: "Tengger Desert Solar Park", technology: "solar", country: "China", subtype: "Fotovoltaica", region: "Ningxia, desierto de Tengger", capacityMW: 1547, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 37.50, lng: 105.05, coordsConfidence: "aproximada" },
+  { id: "solar-noor-abu-dhabi", name: "Noor Abu Dhabi", technology: "solar", country: "Emiratos Árabes Unidos", subtype: "Fotovoltaica", region: "Abu Dabi", capacityMW: 1177, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 23.65, lng: 54.75, coordsConfidence: "aproximada" },
+  { id: "solar-jichuan", name: "Jichuan Solar Park", technology: "solar", country: "China", subtype: "Fotovoltaica", region: "China (región no confirmada)", capacityMW: 1030, status: "Operativa", source: "Sunsave / prensa sectorial", lat: null, lng: null, coordsConfidence: "sin_confirmar" },
+  { id: "solar-kurnool", name: "Kurnool Ultra Mega Solar Park", technology: "solar", country: "India", subtype: "Fotovoltaica", region: "Andhra Pradesh", capacityMW: 1000, status: "Operativa", source: "Sunsave / prensa sectorial", lat: 15.75, lng: 78.31, coordsConfidence: "aproximada" },
+
+  { id: "wind-on-hami", name: "Xinjiang Hami Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Xinjiang", capacityMW: 11947, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 42.80, lng: 93.50, coordsConfidence: "aproximada" },
+  { id: "wind-on-guazhou", name: "Gansu Guazhou Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Gansu", capacityMW: 10450, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 40.52, lng: 95.77, coordsConfidence: "aproximada" },
+  { id: "wind-on-hinggan", name: "Hinggan League Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Mongolia Interior", capacityMW: 3000, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 46.08, lng: 122.05, coordsConfidence: "aproximada" },
+  { id: "wind-on-dabancheng", name: "Dabancheng Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Xinjiang", capacityMW: 2500, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 43.35, lng: 88.30, coordsConfidence: "aproximada" },
+  { id: "wind-on-qingyang", name: "Qingyang Huanxian Huaneng Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Gansu", capacityMW: 2270, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 36.57, lng: 107.30, coordsConfidence: "aproximada" },
+  { id: "wind-on-mori", name: "Mori Wind Farm Complex", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Xinjiang", capacityMW: 2200, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 43.90, lng: 90.30, coordsConfidence: "aproximada" },
+  { id: "wind-on-markbygden", name: "Markbygden Wind Farm", technology: "wind-onshore", country: "Suecia", subtype: "Eólica terrestre", region: "Norrbotten", capacityMW: 2007, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 65.63, lng: 20.65, coordsConfidence: "aproximada" },
+  { id: "wind-on-tenggeli", name: "Tenggeli Desert Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Desierto de Tengger", capacityMW: 1800, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 37.55, lng: 105.10, coordsConfidence: "aproximada" },
+  { id: "wind-on-togtoh", name: "Togtoh Wind Farms", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Mongolia Interior", capacityMW: 1750, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 40.27, lng: 111.15, coordsConfidence: "aproximada" },
+  { id: "wind-on-wulanchabu", name: "Wulanchabu Grid Friendly Wind Farm", technology: "wind-onshore", country: "China", subtype: "Eólica terrestre", region: "Mongolia Interior", capacityMW: 1700, status: "Operativa (por etapas)", source: "Wikipedia - List of onshore wind farms", lat: 41.03, lng: 113.13, coordsConfidence: "aproximada" },
+
+  { id: "wind-off-doggerbank", name: "Dogger Bank (A, B, C)", technology: "wind-offshore", country: "Reino Unido", subtype: "Eólica marina", region: "Mar del Norte, frente a Yorkshire", capacityMW: 3600, status: "Operativa (por fases)", source: "Blackridge Research", lat: 54.75, lng: 2.00, coordsConfidence: "aproximada" },
+  { id: "wind-off-yangjiang", name: "Yangjiang Shaba (Fases 1-5)", technology: "wind-offshore", country: "China", subtype: "Eólica marina", region: "Mar de China Meridional, Guangdong", capacityMW: 1700, status: "Operativa (por fases)", source: "Blackridge Research", lat: 21.75, lng: 112.30, coordsConfidence: "aproximada" },
+  { id: "wind-off-hkzuid", name: "Hollandse Kust Zuid", technology: "wind-offshore", country: "Países Bajos", subtype: "Eólica marina", region: "Mar del Norte", capacityMW: 1529, status: "Operativa", source: "Blackridge Research", lat: 52.13, lng: 4.00, coordsConfidence: "aproximada" },
+  { id: "wind-off-hornsea2", name: "Hornsea Two", technology: "wind-offshore", country: "Reino Unido", subtype: "Eólica marina", region: "Mar del Norte, frente a Yorkshire", capacityMW: 1386, status: "Operativa", source: "Blackridge Research", lat: 53.88, lng: 1.79, coordsConfidence: "aproximada" },
+  { id: "wind-off-hornsea1", name: "Hornsea One", technology: "wind-offshore", country: "Reino Unido", subtype: "Eólica marina", region: "Mar del Norte, frente a Yorkshire", capacityMW: 1218, status: "Operativa", source: "Blackridge Research", lat: 53.89, lng: 1.79, coordsConfidence: "aproximada" },
+  { id: "wind-off-seagreen", name: "Seagreen", technology: "wind-offshore", country: "Reino Unido", subtype: "Eólica marina", region: "Firth of Forth, Escocia", capacityMW: 1075, status: "Operativa", source: "Blackridge Research", lat: 56.58, lng: -1.80, coordsConfidence: "aproximada" },
+  { id: "wind-off-morayeast", name: "Moray East", technology: "wind-offshore", country: "Reino Unido", subtype: "Eólica marina", region: "Moray Firth, Escocia", capacityMW: 950, status: "Operativa", source: "Blackridge Research", lat: 58.15, lng: -2.80, coordsConfidence: "aproximada" },
+  { id: "wind-off-changhua", name: "Greater Changhua 1 & 2a", technology: "wind-offshore", country: "Taiwán", subtype: "Eólica marina", region: "Estrecho de Taiwán", capacityMW: 900, status: "Operativa", source: "Blackridge Research", lat: 24.13, lng: 119.80, coordsConfidence: "aproximada" },
+  { id: "wind-off-tritonknoll", name: "Triton Knoll", technology: "wind-offshore", country: "Reino Unido", subtype: "Eólica marina", region: "Mar del Norte, frente a Lincolnshire", capacityMW: 857, status: "Operativa", source: "Blackridge Research", lat: 53.35, lng: 0.75, coordsConfidence: "aproximada" },
+  { id: "wind-off-hknoord", name: "Hollandse Kust Noord", technology: "wind-offshore", country: "Países Bajos", subtype: "Eólica marina", region: "Mar del Norte", capacityMW: 759, status: "Operativa", source: "Blackridge Research", lat: 52.75, lng: 4.25, coordsConfidence: "aproximada" },
+
+  { id: "hydro-tresgargantas", name: "Presa de las Tres Gargantas", technology: "hydro", country: "China", subtype: "Hidroeléctrica convencional", region: "Yichang, Hubei", capacityMW: 22500, status: "Operativa", source: "Power Technology", lat: 30.825, lng: 111.003, coordsConfidence: "aproximada" },
+  { id: "hydro-itaipu", name: "Itaipú", technology: "hydro", country: "Brasil / Paraguay", subtype: "Hidroeléctrica convencional", region: "Río Paraná", capacityMW: 14000, status: "Operativa", source: "Power Technology", lat: -25.408, lng: -54.589, coordsConfidence: "aproximada" },
+  { id: "hydro-xiluodu", name: "Xiluodu", technology: "hydro", country: "China", subtype: "Hidroeléctrica convencional", region: "Río Jinsha", capacityMW: 13860, status: "Operativa", source: "Power Technology", lat: 28.25, lng: 103.63, coordsConfidence: "aproximada" },
+  { id: "hydro-guri", name: "Guri", technology: "hydro", country: "Venezuela", subtype: "Hidroeléctrica convencional", region: "Río Caroní", capacityMW: 10200, status: "Operativa", source: "Power Technology", lat: 7.77, lng: -62.99, coordsConfidence: "aproximada" },
+  { id: "hydro-belomonte", name: "Belo Monte", technology: "hydro", country: "Brasil", subtype: "Hidroeléctrica convencional", region: "Río Xingú, Pará", capacityMW: 9390, status: "Operativa", source: "Power Technology", lat: -3.10, lng: -51.79, coordsConfidence: "aproximada" },
+  { id: "hydro-tucurui", name: "Tucuruí", technology: "hydro", country: "Brasil", subtype: "Hidroeléctrica convencional", region: "Río Tocantins, Pará", capacityMW: 8370, status: "Operativa", source: "Power Technology", lat: -3.83, lng: -49.64, coordsConfidence: "aproximada" },
+  { id: "hydro-grandcoulee", name: "Grand Coulee", technology: "hydro", country: "Estados Unidos", subtype: "Hidroeléctrica convencional", region: "Río Columbia, Washington", capacityMW: 6800, status: "Operativa", source: "Power Technology", lat: 47.96, lng: -118.98, coordsConfidence: "aproximada" },
+  { id: "hydro-xiangjiaba", name: "Xiangjiaba", technology: "hydro", country: "China", subtype: "Hidroeléctrica convencional", region: "Río Jinsha", capacityMW: 6400, status: "Operativa", source: "Power Technology", lat: 28.60, lng: 104.02, coordsConfidence: "aproximada" },
+  { id: "hydro-sayano", name: "Sayano-Shushenskaya", technology: "hydro", country: "Rusia", subtype: "Hidroeléctrica convencional", region: "Río Yenisei, Siberia", capacityMW: 6400, status: "Operativa", source: "Power Technology", lat: 52.80, lng: 91.35, coordsConfidence: "aproximada" },
+  { id: "hydro-longtan", name: "Longtan", technology: "hydro", country: "China", subtype: "Hidroeléctrica convencional", region: "Río Hongshui, Guangxi", capacityMW: 6300, status: "Operativa", source: "Power Technology", lat: 24.77, lng: 107.85, coordsConfidence: "aproximada" },
+
+  { id: "geo-geysers", name: "The Geysers Geothermal Complex", technology: "geothermal", country: "Estados Unidos", subtype: "Vapor seco", region: "California", capacityMW: 1205, status: "Operativa", source: "Power Technology", lat: 38.78, lng: -122.75, coordsConfidence: "aproximada" },
+  { id: "geo-larderello", name: "Larderello Geothermal Complex", technology: "geothermal", country: "Italia", subtype: "Vapor seco", region: "Toscana", capacityMW: 769, status: "Operativa", source: "Power Technology", lat: 43.25, lng: 10.87, coordsConfidence: "aproximada" },
+  { id: "geo-cerroprieto", name: "Cerro Prieto Geothermal Power Station", technology: "geothermal", country: "México", subtype: "Flash", region: "Baja California", capacityMW: 720, status: "Operativa", source: "Power Technology", lat: 32.42, lng: -115.25, coordsConfidence: "aproximada" },
+  { id: "geo-makban", name: "Makban Geothermal Complex", technology: "geothermal", country: "Filipinas", subtype: "Flash", region: "Luzón (Makiling-Banahaw)", capacityMW: 458, status: "Operativa", source: "Power Technology", lat: 14.07, lng: 121.20, coordsConfidence: "aproximada" },
+  { id: "geo-salak", name: "Salak Geothermal Plant", technology: "geothermal", country: "Indonesia", subtype: "Flash", region: "Java Occidental", capacityMW: 377, status: "Operativa", source: "Power Technology", lat: -6.70, lng: 106.73, coordsConfidence: "aproximada" },
+  { id: "geo-saltonsea", name: "Salton Sea Geothermal Plants (CalEnergy)", technology: "geothermal", country: "Estados Unidos", subtype: "Flash", region: "California", capacityMW: 340, status: "Operativa", source: "Power Technology", lat: 33.20, lng: -115.62, coordsConfidence: "aproximada" },
+  { id: "geo-sarulla", name: "Sarulla Geothermal Power Plant", technology: "geothermal", country: "Indonesia", subtype: "Flash / binario", region: "Sumatra del Norte", capacityMW: 330, status: "Operativa", source: "Power Technology", lat: 1.75, lng: 99.05, coordsConfidence: "aproximada" },
+  { id: "geo-hellisheidi", name: "Hellisheidi Geothermal Power Plant", technology: "geothermal", country: "Islandia", subtype: "Flash", region: "Hengill", capacityMW: 303, status: "Operativa", source: "Power Technology", lat: 64.03, lng: -21.40, coordsConfidence: "aproximada" },
+  { id: "geo-tiwi", name: "Tiwi Geothermal Complex", technology: "geothermal", country: "Filipinas", subtype: "Flash", region: "Luzón (Albay)", capacityMW: 289, status: "Operativa", source: "Power Technology", lat: 13.15, lng: 123.65, coordsConfidence: "aproximada" },
+  { id: "geo-darajat", name: "Darajat Power Station", technology: "geothermal", country: "Indonesia", subtype: "Vapor seco", region: "Java Occidental", capacityMW: 271, status: "Operativa", source: "Power Technology", lat: -7.28, lng: 107.72, coordsConfidence: "aproximada" },
+];
+
+const TECHNOLOGY_META = {
+  "geothermal":    { label: "Geotérmica",       color: "#2fd6c8" },
+  "solar":         { label: "Solar",            color: "#f5a623" },
+  "wind-onshore":  { label: "Eólica terrestre", color: "#5b9bd5" },
+  "wind-offshore": { label: "Eólica marina",     color: "#8b7fd9" },
+  "hydro":         { label: "Hidroeléctrica",    color: "#4caf7d" },
+};
+
+// Íconos inline por tecnología, en un lienzo local 24x24 centrado en (12,12).
+const TECHNOLOGY_ICON_INNER = {
+  "solar": `<circle cx="12" cy="12" r="4" fill="#0b1120" stroke="none"/>
+    <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
+    <line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
+    <line x1="4.5" y1="4.5" x2="6.6" y2="6.6"/><line x1="17.4" y1="17.4" x2="19.5" y2="19.5"/>
+    <line x1="4.5" y1="19.5" x2="6.6" y2="17.4"/><line x1="17.4" y1="6.6" x2="19.5" y2="4.5"/>`,
+  "wind-onshore": `<circle cx="12" cy="6" r="1" fill="#0b1120" stroke="none"/>
+    <line x1="12" y1="6" x2="12" y2="1.5"/><line x1="12" y1="6" x2="8" y2="9.5"/>
+    <line x1="12" y1="6" x2="16.5" y2="8.5"/><line x1="12" y1="7" x2="12" y2="21.5"/>`,
+  "wind-offshore": `<circle cx="12" cy="5" r="1" fill="#0b1120" stroke="none"/>
+    <line x1="12" y1="5" x2="12" y2="1"/><line x1="12" y1="5" x2="8.2" y2="8.3"/>
+    <line x1="12" y1="5" x2="16.3" y2="7.5"/><line x1="12" y1="6" x2="12" y2="17"/>
+    <path d="M4 18c1.5 1.3 3 1.3 4.5 0s3-1.3 4.5 0 3 1.3 4.5 0 3-1.3 4.5 0" fill="none"/>
+    <path d="M4 21c1.5 1.3 3 1.3 4.5 0s3-1.3 4.5 0 3 1.3 4.5 0 3-1.3 4.5 0" fill="none"/>`,
+  "hydro": `<path d="M12 2C12 2 5 11.2 5 15.6C5 19.1 8.13 22 12 22C15.87 22 19 19.1 19 15.6C19 11.2 12 2 12 2Z" fill="#0b1120" stroke="none"/>`,
+  "geothermal": `<path d="M12 21c-3 0-3-3 0-4.2s3-3.6 0-4.8 3-3 0-4.2" fill="none"/>
+    <path d="M7 21c-1.6 0-1.6-2.1 0-3.1s1.6-2.1 0-3.1" fill="none"/>
+    <path d="M17 21c1.6 0 1.6-2.1 0-3.1s-1.6-2.1 0-3.1" fill="none"/>`,
+};
+
+// País (español, como viene en la fuente MUGARA) → nombre en el dataset de
+// países (Natural Earth / world-atlas). "Brasil / Paraguay" se reparte entre
+// los dos países reales para pintar ambos por Itaipú.
+const COUNTRY_ES_TO_EN = {
+  "China": "China", "India": "India", "Egipto": "Egypt",
+  "Emiratos Árabes Unidos": "United Arab Emirates", "Suecia": "Sweden",
+  "Reino Unido": "United Kingdom", "Países Bajos": "Netherlands",
+  "Taiwán": "Taiwan", "Brasil": "Brazil", "Paraguay": "Paraguay",
+  "Venezuela": "Venezuela", "Estados Unidos": "United States of America",
+  "Rusia": "Russia", "Italia": "Italy", "México": "Mexico",
+  "Filipinas": "Philippines", "Indonesia": "Indonesia", "Islandia": "Iceland",
+};
+
+function countryTokens(asset) {
+  return asset.country.split("/").map((s) => s.trim());
+}
+
+const located = ASSETS.filter((a) => a.lat != null && a.lng != null);
+
+// Capacidad total por tecnología, por cada país real (para pintar cada país
+// por su tecnología dominante — la de mayor MW instalada allí).
+const capacityByCountryTech = new Map();
+ASSETS.forEach((asset) => {
+  countryTokens(asset).forEach((token) => {
+    const enName = COUNTRY_ES_TO_EN[token] ?? token;
+    if (!capacityByCountryTech.has(enName)) capacityByCountryTech.set(enName, {});
+    const rec = capacityByCountryTech.get(enName);
+    rec[asset.technology] = (rec[asset.technology] ?? 0) + asset.capacityMW;
+  });
+});
+function dominantTechFor(countryName) {
+  const rec = capacityByCountryTech.get(countryName);
+  if (!rec) return null;
+  return Object.entries(rec).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+const svg = d3.select("#map");
+const projection = d3.geoNaturalEarth1().fitExtent([[10, 14], [950, 486]], { type: "Sphere" });
+const path = d3.geoPath(projection);
+const zoomG = svg.append("g").attr("class", "zoomable");
+const gGrid = zoomG.append("g");
+const gCountries = zoomG.append("g");
+const gMarkers = zoomG.append("g");
+const graticule = d3.geoGraticule().step([20, 20]);
+gGrid.append("path").attr("class", "sphere").attr("d", path({ type: "Sphere" }));
+gGrid.append("path").attr("class", "grat").attr("d", path(graticule()));
+const gDeco = svg.append("g").attr("class", "deco");
+(function frame() {
+  const marks = [-60, -30, 0, 30, 60];
+  marks.forEach((lat) => {
+    const y = projection([0, lat])[1];
+    gDeco.append("line").attr("x1", 10).attr("x2", 22).attr("y1", y).attr("y2", y);
+    gDeco.append("line").attr("x1", 938).attr("x2", 950).attr("y1", y).attr("y2", y);
+    gDeco.append("text").attr("x", 26).attr("y", y + 2.5).text((lat > 0 ? "N" : lat < 0 ? "S" : "EQ") + (lat ? Math.abs(lat) + "°" : ""));
+  });
+})();
+
+const pop = document.getElementById("pop");
+const mapbox = document.getElementById("mapbox");
+const NODATA = () => getComputedStyle(document.body).getPropertyValue("--nodata").trim();
+
+let filter = null; // tech key
+let selectedId = null;
+
+function isInk() { return document.body.dataset.theme === "tinta"; }
+
+function countryFill(feature) {
+  const dom = dominantTechFor(feature.properties.name);
+  if (!dom) return NODATA();
+  if (isInk() && filter && filter !== dom) return "#3a3a3a";
+  return TECHNOLOGY_META[dom].color;
+}
+
+function paint() {
+  gCountries.selectAll("path.country")
+    .attr("fill", countryFill)
+    .classed("dim", (d) => {
+      const dom = dominantTechFor(d.properties.name);
+      return !!dom && !!filter && filter !== dom;
+    });
+  gMarkers.selectAll(".asset-marker")
+    .classed("dim", (d) => !!filter && filter !== d.technology)
+    .classed("active", (d) => d.id === selectedId);
+  document.querySelectorAll(".chip").forEach((c) => {
+    const on = c.dataset.tech === filter;
+    c.style.color = on ? TECHNOLOGY_META[c.dataset.tech].color : "";
+    c.setAttribute("aria-pressed", on);
+  });
+}
+
+function showPop(x, y, kicker, title, sub) {
+  const subs = (Array.isArray(sub) ? sub : [sub]).filter(Boolean).map((s) => `<div class="s">${s}</div>`).join("");
+  pop.innerHTML = `<div class="r">${kicker}</div><div class="t">${title}</div>${subs}`;
+  const w = mapbox.getBoundingClientRect().width;
+  pop.style.left = Math.max(78, Math.min(w - 78, x)) + "px";
+  pop.style.top = Math.max(58, y - 14) + "px";
+  pop.classList.add("on");
+}
+const hidePop = () => pop.classList.remove("on");
+
+function svgToBox(sx, sy) {
+  const rect = mapbox.getBoundingClientRect();
+  return [(sx / 960) * rect.width, (sy / 500) * rect.height];
+}
+
+// Zoom con scroll del mouse (y arrastre para desplazar) sobre el propio
+// SVG — la misma transformación se reutiliza para el zoom programático
+// (chips, marcadores, "Vista completa") llamando a zoom.transform, así
+// ambos mecanismos quedan sincronizados y no se pisan entre sí.
+const controlsEl = document.querySelector(".controls");
+const maptoolsEl = document.querySelector(".maptools");
+const MAX_UI_SCALE = 1.3;
+
+function syncControlsScale(k) {
+  const uiScale = Math.min(k, MAX_UI_SCALE);
+  controlsEl.style.transform = `scale(${uiScale})`;
+  maptoolsEl.style.transform = `scale(${uiScale})`;
+}
+
+const zoom = d3.zoom()
+  .scaleExtent([1, 12])
+  .on("zoom", (event) => {
+    zoomG.attr("transform", event.transform);
+    syncControlsScale(event.transform.k);
+  });
+svg.call(zoom).on("dblclick.zoom", null);
+
+function zoomToPoints(points) {
+  if (!points.length) return;
+  const xs = points.map((p) => p[0]);
+  const ys = points.map((p) => p[1]);
+  const [x0, x1] = [Math.min(...xs), Math.max(...xs)];
+  const [y0, y1] = [Math.min(...ys), Math.max(...ys)];
+  const pad = 60;
+  const w = Math.max(x1 - x0, 20) + pad * 2;
+  const h = Math.max(y1 - y0, 20) + pad * 2;
+  const k = Math.min(7, Math.max(1, Math.min(960 / w, 500 / h)));
+  const cx = (x0 + x1) / 2;
+  const cy = (y0 + y1) / 2;
+  const t = d3.zoomIdentity.translate(480, 250).scale(k).translate(-cx, -cy);
+  svg.transition().duration(650).call(zoom.transform, t);
+}
+function resetZoom() {
+  svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+}
+
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json").then((topo) => {
+  const features = topojson.feature(topo, topo.objects.countries).features;
+
+  gCountries.selectAll("path.country").data(features).join("path")
+    .attr("class", (d) => "country" + (dominantTechFor(d.properties.name) ? " has-assets" : ""))
+    .attr("d", path)
+    .on("mousemove", (ev, d) => {
+      const dom = dominantTechFor(d.properties.name);
+      if (!dom) { hidePop(); return; }
+      const meta = TECHNOLOGY_META[dom];
+      const [cx, cy] = path.centroid(d);
+      const [x, y] = svgToBox(cx, cy);
+      showPop(x, y, meta.label, d.properties.name, "Tecnología dominante por MW instalado");
+    })
+    .on("mouseleave", hidePop)
+    .on("click", (ev, d) => {
+      const dom = dominantTechFor(d.properties.name);
+      if (dom) { filter = filter === dom ? null : dom; paint(); zoomToTech(filter); }
+    });
+
+  renderMarkers();
+  buildChips();
+  buildLegend();
+  buildStats();
+  paint();
+  focusAssetFromUrl();
+});
+
+function focusAssetFromUrl() {
+  const assetId = new URLSearchParams(location.search).get("asset");
+  const asset = located.find((item) => item.id === assetId);
+  if (!asset) return;
+  selectedId = asset.id;
+  filter = null;
+  paint();
+  zoomToPoints([projection([asset.lng, asset.lat])]);
+  setTimeout(() => {
+    const [x, y] = svgToBox(...projection([asset.lng, asset.lat]));
+    const meta = TECHNOLOGY_META[asset.technology];
+    showPop(x, y, meta.label, asset.name, [
+      `${asset.country}${asset.region ? " · " + asset.region : ""}`,
+      `${asset.subtype} · ${asset.capacityMW.toLocaleString("es-ES")} MW · ${asset.status}`,
+    ]);
+  }, 700);
+}
+
+function renderMarkers() {
+  gMarkers.selectAll(".asset-marker").data(located, (d) => d.id).join((enter) => {
+    const g = enter.append("g")
+      .attr("class", "asset-marker")
+      .attr("transform", (d) => { const [x, y] = projection([d.lng, d.lat]); return `translate(${x},${y})`; })
+      .on("mousemove", (ev, d) => {
+        const [x, y] = svgToBox(...projection([d.lng, d.lat]));
+        const meta = TECHNOLOGY_META[d.technology];
+        const lines = [
+          `${d.country}${d.region ? " · " + d.region : ""}`,
+          `${d.subtype} · ${d.capacityMW.toLocaleString("es-ES")} MW · ${d.status}`,
+          `Fuente: ${d.source}`,
+        ];
+        if (d.coordsConfidence === "aproximada") {
+          lines.push("Ubicación aproximada — pendiente de validar contra Global Energy Monitor.");
+        }
+        showPop(x, y, meta.label, d.name, lines);
+      })
+      .on("mouseleave", hidePop)
+      .on("click", (ev, d) => {
+        ev.stopPropagation();
+        selectedId = d.id;
+        paint();
+        zoomToPoints([projection([d.lng, d.lat])]);
+      });
+    // Anillo de "ping" (solo visible en :hover, ver CSS) + el marcador en sí,
+    // agrupados en .asset-marker__visual para poder animar/escalar ambos
+    // juntos (posición aparte, en el transform del <g> exterior) — incluida
+    // la reducción al 50% en pantalla completa (ver CSS ":fullscreen").
+    const visual = g.append("g").attr("class", "asset-marker__visual");
+    visual.append("circle")
+      .attr("class", "asset-marker__ping")
+      .attr("r", 6)
+      .attr("fill", "none")
+      .attr("stroke", (d) => TECHNOLOGY_META[d.technology].color)
+      .attr("stroke-width", 2);
+    visual.append("circle").attr("r", 6).attr("fill", (d) => TECHNOLOGY_META[d.technology].color);
+    visual.append("g").attr("transform", "scale(0.34) translate(-12,-12)")
+      .each(function (d) { this.innerHTML = TECHNOLOGY_ICON_INNER[d.technology]; })
+      .selectAll("*").attr("stroke", "#0b1120").attr("stroke-width", 1.6).attr("stroke-linecap", "round");
+    return g;
+  });
+}
+
+/* ---------- chips + legend + stats ---------- */
+function techStats(techKey) {
+  const items = ASSETS.filter((a) => a.technology === techKey);
+  const totalMW = items.reduce((sum, a) => sum + a.capacityMW, 0);
+  const countries = new Set();
+  items.forEach((a) => countryTokens(a).forEach((c) => countries.add(c)));
+  return { count: items.length, totalMW, countries: [...countries] };
+}
+
+const chipPop = document.getElementById("chip-pop");
+function showChipPop(button) {
+  const key = button.dataset.tech;
+  const meta = TECHNOLOGY_META[key];
+  const { count, totalMW, countries } = techStats(key);
+  chipPop.innerHTML = `
+    <div class="r">${meta.label}</div>
+    <div class="t">${count} planta${count === 1 ? "" : "s"} · ${(totalMW / 1000).toFixed(1)} GW</div>
+    <div class="s">${countries.join(", ")}</div>`;
+  const rect = button.getBoundingClientRect();
+  chipPop.style.left = rect.left + rect.width / 2 + "px";
+  chipPop.style.top = rect.top - 10 + "px";
+  chipPop.classList.add("on");
+}
+function hideChipPop() { chipPop.classList.remove("on"); }
+
+function buildChips() {
+  const c = document.getElementById("chips");
+  c.innerHTML = Object.entries(TECHNOLOGY_META).map(([key, meta]) =>
+    `<button class="chip" data-tech="${key}" aria-pressed="false"><span class="dot" style="color:${meta.color}"></span>${meta.label}</button>`).join("");
+  c.querySelectorAll(".chip").forEach((b) => {
+    b.onclick = () => {
+      filter = filter === b.dataset.tech ? null : b.dataset.tech;
+      paint(); zoomToTech(filter); hideChipPop();
+    };
+    b.addEventListener("mouseenter", () => showChipPop(b));
+    b.addEventListener("mouseleave", hideChipPop);
+    b.addEventListener("focus", () => showChipPop(b));
+    b.addEventListener("blur", hideChipPop);
+  });
+}
+function zoomToTech(techKey) {
+  if (!techKey) { resetZoom(); return; }
+  const pts = located.filter((a) => a.technology === techKey).map((a) => projection([a.lng, a.lat]));
+  zoomToPoints(pts);
+}
+function buildLegend() {
+  const unlocatedAssets = ASSETS.filter((a) => a.lat == null || a.lng == null);
+  const unlocatedNote = unlocatedAssets.length
+    ? `<span>⚠ ${unlocatedAssets.map((a) => a.name).join(", ")} — sin ubicación confirmada, no se muestra en el mapa</span>`
+    : "";
+  document.getElementById("legend").innerHTML =
+    Object.values(TECHNOLOGY_META).map((m) => `<span><i style="background:${m.color}"></i>${m.label}</span>`).join("") +
+    `<span><i style="background:${NODATA()}"></i>Sin activos en el país</span>` +
+    unlocatedNote;
+}
+function buildStats() {
+  const totalMW = ASSETS.reduce((sum, a) => sum + a.capacityMW, 0);
+  const countries = new Set();
+  ASSETS.forEach((a) => countryTokens(a).forEach((t) => countries.add(t)));
+  const rows = [
+    [ASSETS.length, MAP_ENGLISH ? "Assets" : "Activos"],
+    [(totalMW / 1000).toFixed(1) + " GW", MAP_ENGLISH ? "Total capacity" : "Capacidad total"],
+    [Object.keys(TECHNOLOGY_META).length, MAP_ENGLISH ? "Technologies" : "Tecnologías"],
+    [countries.size, MAP_ENGLISH ? "Countries" : "Países"],
+  ];
+  document.getElementById("stats").innerHTML = rows.map(([i, s]) => `<div class="stat"><i>${i}</i><s>${s}</s></div>`).join("");
+}
+
+document.getElementById("zoom-reset").onclick = () => { filter = null; selectedId = null; paint(); resetZoom(); };
+document.getElementById("lines-toggle").onclick = (e) => {
+  const on = mapbox.classList.toggle("lines-mode");
+  e.currentTarget.textContent = on ? (MAP_ENGLISH ? "Colors" : "Colores") : (MAP_ENGLISH ? "Lines" : "Líneas");
+};
+
+// --- Pantalla completa -------------------------------------------------
+const fullscreenBtn = document.getElementById("fullscreen-toggle");
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+fullscreenBtn.onclick = () => {
+  if (!isFullscreen()) {
+    const request = mapbox.requestFullscreen || mapbox.webkitRequestFullscreen;
+    request?.call(mapbox)?.catch(() => {});
+  } else {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    exit?.call(document)?.catch(() => {});
+  }
+};
+function syncFullscreenLabel() {
+  fullscreenBtn.textContent = isFullscreen() ? (MAP_ENGLISH ? "Exit fullscreen" : "Salir de pantalla completa") : (MAP_ENGLISH ? "Fullscreen" : "Pantalla completa");
+}
+document.addEventListener("fullscreenchange", syncFullscreenLabel);
+document.addEventListener("webkitfullscreenchange", syncFullscreenLabel);
+
+document.querySelectorAll(".tbtn").forEach((b) => b.onclick = () => {
+  document.body.dataset.theme = b.dataset.theme;
+  document.querySelectorAll(".tbtn").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  buildLegend(); paint();
+});
+
+// --- Resplandor tierra/mar que sigue al cursor sobre el mapa -----------
+const cursorGlow = document.getElementById("cursor-glow");
+const GLOW_LAND = "#f2a65a";
+const GLOW_SEA = "#4fd1e8";
+mapbox.addEventListener("mousemove", (event) => {
+  const rect = mapbox.getBoundingClientRect();
+  const isLand = !!event.target.closest?.("path.country");
+  cursorGlow.style.setProperty("--cursor-x", `${event.clientX - rect.left}px`);
+  cursorGlow.style.setProperty("--cursor-y", `${event.clientY - rect.top}px`);
+  cursorGlow.style.setProperty("--cursor-color", isLand ? GLOW_LAND : GLOW_SEA);
+  cursorGlow.classList.add("on");
+});
+mapbox.addEventListener("mouseleave", () => cursorGlow.classList.remove("on"));
+
+addEventListener("resize", hidePop, { passive: true });
+addEventListener("scroll", hideChipPop, { passive: true });
+</script>
+</body>
+</html>

@@ -8,6 +8,7 @@ export const translations = {
     nav_equipo: "Equipo",
     nav_franquicias: "Franquicias",
     nav_contactos: "Contactos",
+    nav_mugara: "MUGARA",
 
     // Home Section
     hero_tag: "INNOVACIÓN ENERGÉTICA SOSTENIBLE",
@@ -241,7 +242,30 @@ export const translations = {
     visor_b4_title: "Aprovechamiento de un recurso local",
     visor_b4_desc: "Acercar la producción energética a los lugares de consumo cuando las condiciones geológicas lo permitan.",
     visor_b5_title: "Menor ocupación en superficie",
-    visor_b5_desc: "Concentrar la captación bajo tierra, con potencial para una instalación superficial compacta."
+    visor_b5_desc: "Concentrar la captación bajo tierra, con potencial para una instalación superficial compacta.",
+
+    // MUGARA Section
+    mugara_subtitle: "INTELIGENCIA DE ACTIVOS ENERGÉTICOS",
+    mugara_title: "MUGARA",
+    mugara_desc: "Plataforma tecnológica independiente para operar y predecir fallas en cualquier infraestructura energética, sin depender de un único fabricante u operador.",
+    mugara_map_title: "Mapa global de activos",
+    mugara_map_desc: "49 plantas renovables de referencia a nivel mundial. Las coordenadas son aproximadas y están pendientes de validar contra Global Energy Monitor.",
+    mugara_about_title: "Qué es MUGARA",
+    mugara_about1_title: "Independiente",
+    mugara_about1_text: "MUGARA es una plataforma tecnológica propia, no un producto de marca blanca.",
+    mugara_about2_title: "Agnóstica de infraestructura",
+    mugara_about2_text: "El mismo motor opera y predice fallas en plantas geotérmicas, parques eólicos, centros de datos y otras infraestructuras críticas.",
+    mugara_about3_title: "Dos formas de trabajar contigo",
+    mugara_about3_text: "Visibilidad y analítica con Data Access, u operación técnica y mantenimiento predictivo con Intelligence Operations.",
+    mugara_method_title: "Cómo procesamos los datos",
+    mugara_method_desc: "Un mismo proceso de tres etapas, aplicado a cualquier tipo de activo conectado.",
+    mugara_method1_title: "Ingesta de telemetría",
+    mugara_method1_text: "Cada activo envía sus métricas en tiempo real a través de un mismo canal de ingesta, sin importar el fabricante.",
+    mugara_method2_title: "Núcleo de inteligencia predictiva",
+    mugara_method2_text: "MUGARA calcula continuamente la vida remanente, la probabilidad de falla a 30/60/90 días y las anomalías activas.",
+    mugara_method3_title: "Reportes y, si aplica, control activo",
+    mugara_method3_text: "Los resultados se traducen en analítica de red y métricas ESG o en recomendaciones y control operativo directo.",
+    mugara_cta: "Solicitar información sobre MUGARA"
   },
   en: {
     // Navigation Links
@@ -252,6 +276,7 @@ export const translations = {
     nav_equipo: "Our Team",
     nav_franquicias: "Franchises",
     nav_contactos: "Contact Us",
+    nav_mugara: "MUGARA",
 
     // Home Section
     hero_tag: "SUSTAINABLE ENERGY INNOVATION",
@@ -485,6 +510,29 @@ export const translations = {
     visor_b4_title: "Local Resource Utilization",
     visor_b4_desc: "Bring energy production closer to consumption sites when geological conditions allow.",
     visor_b5_title: "Minimal Surface Footprint",
-    visor_b5_desc: "Concentrate heat extraction underground, with potential for a compact surface installation."
+    visor_b5_desc: "Concentrate heat extraction underground, with potential for a compact surface installation.",
+
+    // MUGARA Section
+    mugara_subtitle: "ENERGY ASSET INTELLIGENCE",
+    mugara_title: "MUGARA",
+    mugara_desc: "Independent technology platform to operate and predict failures across any energy infrastructure, without depending on a single manufacturer or operator.",
+    mugara_map_title: "Global asset map",
+    mugara_map_desc: "49 benchmark renewable plants worldwide. Coordinates are approximate and pending validation against Global Energy Monitor.",
+    mugara_about_title: "What is MUGARA",
+    mugara_about1_title: "Independent",
+    mugara_about1_text: "MUGARA is a proprietary technology platform, not a white-label infrastructure product.",
+    mugara_about2_title: "Infrastructure-agnostic",
+    mugara_about2_text: "The same engine operates and predicts failures across geothermal plants, wind farms, data centers and other critical infrastructure.",
+    mugara_about3_title: "Two ways to work with you",
+    mugara_about3_text: "Visibility and analytics with Data Access, or technical operation and predictive maintenance with Intelligence Operations.",
+    mugara_method_title: "How we process data",
+    mugara_method_desc: "A consistent three-stage process applied to every connected asset type.",
+    mugara_method1_title: "Telemetry ingestion",
+    mugara_method1_text: "Every asset sends its real-time metrics through a unified ingestion channel, regardless of manufacturer.",
+    mugara_method2_title: "Predictive intelligence core",
+    mugara_method2_text: "MUGARA continuously calculates remaining useful life, 30/60/90-day failure probability and active anomalies.",
+    mugara_method3_title: "Reports and, when applicable, active control",
+    mugara_method3_text: "Results become network analytics and ESG metrics, or recommendations and direct operational control.",
+    mugara_cta: "Request information about MUGARA"
   }
 };

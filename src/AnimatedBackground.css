@@ -1,0 +1,146 @@
+/* ==========================================================================
+   FONDO VECTORIAL ANIMADO — SIMULACIÓN DE MAGMA
+   BEM: .bgfx / .bgfx__*
+   ========================================================================== */
+
+.bgfx {
+  --bgfx-opacity: 0.85;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  opacity: var(--bgfx-opacity);
+}
+
+html[data-theme='light'] .bgfx {
+  --bgfx-opacity: 0.4;
+}
+
+.bgfx__svg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+/* --- 1. Resplandor térmico que respira --- */
+.bgfx__haze {
+  animation: bgfx-breathe 9s ease-in-out infinite;
+}
+
+@keyframes bgfx-breathe {
+  0%, 100% { opacity: 0.65; }
+  50%      { opacity: 1; }
+}
+
+/* --- 2. Burbujas de magma: ascenso lento y retorno (se funden vía filtro) --- */
+.bgfx__blob {
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+  animation: bgfx-blob ease-in-out infinite alternate;
+}
+
+@keyframes bgfx-blob {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  45%  { transform: translate3d(calc(var(--bgfx-dx, 40px) * 0.35), calc(var(--bgfx-rise, -200px) * 0.7), 0) scale(calc(1 - (1 - var(--bgfx-s, 1.1)) * 0.4)); }
+  100% { transform: translate3d(var(--bgfx-dx, 40px), var(--bgfx-rise, -200px), 0) scale(var(--bgfx-s, 1.1)); }
+}
+
+/* --- 3. Vetas de magma activas (contorno irregular relleno) --- */
+.bgfx__vein-glow {
+  fill: #ff4d00;
+  stroke: #ff4d00;
+  stroke-linejoin: round;
+  opacity: 0.4;
+}
+
+.bgfx__hotspot-glow {
+  fill: #ff7a1a;
+  opacity: 0.35;
+}
+
+/* El color se anima vía currentColor para que relleno y borde cambien juntos */
+.bgfx__vein-core {
+  color: #ff5d02;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  opacity: 0.8;
+  animation: bgfx-vein-beat 5.5s ease-in-out infinite;
+}
+
+.bgfx__hotspot {
+  fill: #ffb02e;
+  opacity: 0.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bgfx-hotspot 4s ease-in-out infinite;
+}
+
+/* Pulso incandescente: longitud (dasharray) y recorrido (--bgfx-travel) fijados por veta */
+.bgfx__vein-pulse {
+  fill: none;
+  stroke: #ffe08a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dashoffset: 0;
+  opacity: 0.95;
+  animation: bgfx-vein-flow 10s linear infinite;
+}
+
+@keyframes bgfx-vein-beat {
+  0%, 100% { opacity: 0.5;  color: #d93700; }
+  50%      { opacity: 0.95; color: #ff8a1f; }
+}
+
+@keyframes bgfx-hotspot {
+  0%, 100% { transform: scale(0.8); opacity: 0.3; }
+  50%      { transform: scale(1.35); opacity: 0.95; }
+}
+
+@keyframes bgfx-vein-flow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: var(--bgfx-travel, -1100); }
+}
+
+/* --- 4. Brasas ascendentes con balanceo --- */
+.bgfx__ember {
+  fill: #ffb347;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: bgfx-ember linear infinite;
+}
+
+@keyframes bgfx-ember {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  12%  { opacity: 0.95; }
+  50%  { transform: translate3d(var(--bgfx-sway, 20px), calc(var(--bgfx-rise, -300px) * 0.5), 0); }
+  100% { transform: translate3d(calc(var(--bgfx-sway, 20px) * -0.6), var(--bgfx-rise, -300px), 0); opacity: 0; }
+}
+
+/* --- Pantallas pequeñas: menos coste de filtro y partículas --- */
+@media (max-width: 640px) {
+  .bgfx__ember:nth-child(n + 11) { display: none; }
+  .bgfx__vein-core--branch,
+  .bgfx__vein-pulse--branch,
+  .bgfx__hotspot--branch { display: none; }
+}
+
+/* --- Accesibilidad: composición estática sin movimiento --- */
+@media (prefers-reduced-motion: reduce) {
+  .bgfx__haze,
+  .bgfx__blob,
+  .bgfx__vein-core,
+  .bgfx__hotspot,
+  .bgfx__vein-pulse,
+  .bgfx__ember {
+    animation: none;
+  }
+
+  .bgfx__vein-pulse { display: none; }
+  .bgfx__ember { opacity: 0.4; }
+}
