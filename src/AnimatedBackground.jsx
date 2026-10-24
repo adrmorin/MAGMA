@@ -11,7 +11,10 @@ import './AnimatedBackground.css';
  *     trazado quebrado (fractura de roca) y un grosor variable — adelgaza hacia
  *     la punta, con estrechamientos y engrosamientos — y puntos calientes que
  *     laten por separado. Por ellas viaja el flujo de magma.
- *  4. Brasas ascendentes con balanceo.
+ *  4. Ebullición: burbujas incandescentes que se hinchan en la superficie del
+ *     lago (y sobre los puntos calientes de las vetas) y revientan con destello,
+ *     onda expansiva y salpicaduras que describen un arco.
+ *  5. Brasas ascendentes con balanceo.
  * Todo se calcula una sola vez al cargar el módulo (generador con semilla, por
  * lo que el resultado es siempre el mismo). Las animaciones son
  * transform/opacity/dashoffset; la turbulencia SMIL se omite si el usuario
@@ -169,6 +172,45 @@ const BLOBS = (() => {
   });
 })();
 
+// Burbujas que revientan. Todas las piezas de una burbuja comparten duración y
+// retardo, así que el estallido (≈72 % del ciclo) queda sincronizado.
+const makeDrops = (rnd, r, count, power) => Array.from({ length: count }, () => {
+  const ang = -Math.PI / 2 + (rnd() - 0.5) * Math.PI * 0.95;
+  const v = r * power * (0.6 + rnd() * 0.8);
+  return {
+    x: r1(Math.cos(ang) * v * 1.3),
+    y: r1(Math.sin(ang) * v),
+    r: r1(Math.max(0.8, r * (0.07 + rnd() * 0.1))),
+  };
+});
+
+const BURSTS = (() => {
+  const rnd = mulberry32(9001);
+  const lake = Array.from({ length: 16 }, () => {
+    const r = 10 + rnd() ** 1.6 * 30;                 // 10–40, sesgado a pequeñas
+    return {
+      x: r1(40 + rnd() * 1360),
+      y: r1(882 + rnd() * 8),                       // sobre la superficie del lago
+      r: r1(r),
+      dur: r1(3.5 + rnd() * 5),
+      delay: r1(-rnd() * 9),
+      drops: makeDrops(rnd, r, 5 + Math.floor(rnd() * 4), 3.6),
+    };
+  });
+  const veins = VEIN_DEFS.flatMap((v) => v.hot)
+    .filter((_, i) => i % 2 === 0)
+    .map((h) => ({
+      x: h.x,
+      y: h.y,
+      r: r1(Math.max(2.5, h.r * 0.8)),
+      dur: r1(4 + rnd() * 6),
+      delay: r1(-rnd() * 10),
+      drops: makeDrops(rnd, h.r, 3, 2.6),
+      vein: true,
+    }));
+  return [...lake, ...veins];
+})();
+
 const EMBERS = Array.from({ length: 24 }, (_, i) => ({
   x: 40 + ((i * 163) % 1360),
   y: 780 + ((i * 37) % 120),
@@ -226,6 +268,27 @@ export default function AnimatedBackground() {
             <feGaussianBlur in="warp" stdDeviation="8" result="blur" />
             <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
           </filter>
+
+          {/* Burbuja incandescente: núcleo casi blanco con brillo desplazado → costra roja */}
+          <radialGradient id="bgfx-bubble" cx="50%" cy="50%" r="50%" fx="38%" fy="32%">
+            <stop offset="0%" stopColor="#fff6c2" />
+            <stop offset="35%" stopColor="#ffd23f" />
+            <stop offset="75%" stopColor="#ff8a1f" />
+            <stop offset="100%" stopColor="#e03a00" />
+          </radialGradient>
+          <radialGradient id="bgfx-bubble-halo">
+            <stop offset="0%" stopColor="#ffb02e" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#ff4d00" stopOpacity="0" />
+          </radialGradient>
+          {/* Recorte de la superficie: la cúpula solo se ve por encima del lago */}
+          <clipPath id="bgfx-surface" clipPathUnits="userSpaceOnUse">
+            <rect x="-200" y="-300" width="400" height="303" />
+          </clipPath>
+          <radialGradient id="bgfx-flash">
+            <stop offset="0%" stopColor="#fffbe0" stopOpacity="1" />
+            <stop offset="40%" stopColor="#ffd23f" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#ff8a1f" stopOpacity="0" />
+          </radialGradient>
 
           {/* Halo de las vetas (userSpaceOnUse: las vetas verticales no tienen bbox plano) */}
           <filter id="bgfx-vein-blur" filterUnits="userSpaceOnUse" x="-100" y="-100" width="1640" height="1100">
@@ -335,7 +398,39 @@ export default function AnimatedBackground() {
           ))}
         </g>
 
-        {/* 4. Brasas */}
+        {/* 4. Ebullición: burbujas que revientan (sin filtros: solo degradados) */}
+        <g className="bgfx__bursts">
+          {BURSTS.map((b) => (
+            <g
+              key={`b-${b.x}-${b.y}`}
+              transform={`translate(${b.x} ${b.y})`}
+              className={`bgfx__burst${b.vein ? ' bgfx__burst--vein' : ''}`}
+              style={{ '--bb-dur': `${b.dur}s`, '--bb-delay': `${b.delay}s`, '--bb-r': `${b.r}px` }}
+            >
+              <circle r={b.r * 2.2} fill="url(#bgfx-bubble-halo)" className="bgfx__bubble" />
+              {b.vein ? (
+                <circle r={b.r} fill="url(#bgfx-bubble)" className="bgfx__bubble" />
+              ) : (
+                // La cúpula emerge desde dentro del lago; el recorte oculta la parte sumergida
+                <g clipPath="url(#bgfx-surface)">
+                  <circle r={b.r} fill="url(#bgfx-bubble)" className="bgfx__dome" />
+                </g>
+              )}
+              <circle r={b.r * 2.6} fill="url(#bgfx-flash)" className="bgfx__flash" />
+              <circle r={b.r} className="bgfx__ring" vectorEffect="non-scaling-stroke" />
+              {b.drops.map((d) => (
+                <circle
+                  key={`d-${d.x}-${d.y}`}
+                  r={d.r}
+                  className="bgfx__drop"
+                  style={{ '--bd-x': `${d.x}px`, '--bd-y': `${d.y}px` }}
+                />
+              ))}
+            </g>
+          ))}
+        </g>
+
+        {/* 5. Brasas */}
         <g className="bgfx__embers">
           {EMBERS.map((e, i) => (
             <circle

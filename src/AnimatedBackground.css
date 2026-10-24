@@ -107,7 +107,95 @@ html[data-theme='light'] .bgfx {
   to   { stroke-dashoffset: var(--bgfx-travel, -1100); }
 }
 
-/* --- 4. Brasas ascendentes con balanceo --- */
+/* --- 4. Ebullición: burbujas que se hinchan y revientan ---
+   Ciclo común por burbuja (--bb-dur / --bb-delay); el estallido ocurre al 72 %. */
+.bgfx__burst > * {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-duration: var(--bb-dur, 5s);
+  animation-delay: var(--bb-delay, 0s);
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.bgfx__bubble { animation-name: bgfx-bubble; }
+
+/* La cúpula vive dentro de un <g> recortado: se animan sus propiedades, no las del <g> */
+.bgfx__burst > g { opacity: 1; animation: none; }
+.bgfx__dome {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: bgfx-dome var(--bb-dur, 5s) ease-in-out var(--bb-delay, 0s) infinite;
+}
+.bgfx__flash  { animation-name: bgfx-flash; animation-timing-function: ease-out; }
+
+.bgfx__ring {
+  fill: none;
+  stroke: #ffb02e;
+  stroke-width: 2.2;
+  animation-name: bgfx-ring;
+  animation-timing-function: ease-out;
+}
+
+.bgfx__drop {
+  fill: #ffcf5a;
+  animation-name: bgfx-drop;
+  animation-timing-function: linear;
+}
+
+@keyframes bgfx-bubble {
+  0%       { transform: scale(0.05); opacity: 0; }
+  8%       { opacity: 0.9; }
+  40%      { transform: scale(0.6, 0.55); }
+  62%      { transform: scale(0.92, 0.86); opacity: 1; }
+  70%      { transform: scale(1.06, 1.12); }
+  72%      { transform: scale(1.18, 1.1); opacity: 1; }
+  74%      { transform: scale(1.4); opacity: 0; }
+  100%     { transform: scale(1.4); opacity: 0; }
+}
+
+/* Emerge desde debajo de la superficie, se hincha, se estira y revienta */
+@keyframes bgfx-dome {
+  0%   { transform: translate3d(0, var(--bb-r, 10px), 0) scale(0.35); opacity: 0; }
+  6%   { opacity: 1; }
+  40%  { transform: translate3d(0, calc(var(--bb-r, 10px) * 0.55), 0) scale(0.75, 0.7); }
+  62%  { transform: translate3d(0, calc(var(--bb-r, 10px) * 0.1), 0) scale(0.96, 0.9); opacity: 1; }
+  70%  { transform: translate3d(0, calc(var(--bb-r, 10px) * -0.2), 0) scale(1.04, 1.12); }
+  72%  { transform: translate3d(0, calc(var(--bb-r, 10px) * -0.28), 0) scale(1.16, 1.08); opacity: 1; }
+  74%  { transform: translate3d(0, calc(var(--bb-r, 10px) * -0.28), 0) scale(1.4); opacity: 0; }
+  100% { transform: translate3d(0, calc(var(--bb-r, 10px) * -0.28), 0) scale(1.4); opacity: 0; }
+}
+
+@keyframes bgfx-flash {
+  0%, 71%  { transform: scale(0.5); opacity: 0; }
+  73%      { transform: scale(1.2); opacity: 1; }
+  86%      { transform: scale(2); opacity: 0; }
+  100%     { transform: scale(2); opacity: 0; }
+}
+
+@keyframes bgfx-ring {
+  0%, 71%  { transform: scale(1, 0.6); opacity: 0; }
+  73%      { transform: scale(1.15, 0.7); opacity: 0.9; }
+  92%      { transform: scale(3, 1.4); opacity: 0; }
+  100%     { transform: scale(3, 1.4); opacity: 0; }
+}
+
+/* Salpicadura: x lineal, y en arco (sube rápido, se frena y cae) */
+@keyframes bgfx-drop {
+  0%, 72%  { transform: translate3d(0, 0, 0); opacity: 0; }
+  73%      { transform: translate3d(0, 0, 0); opacity: 1; }
+  79%      { transform: translate3d(calc(var(--bd-x) * 0.3), calc(var(--bd-y) * 0.75), 0); }
+  85%      { transform: translate3d(calc(var(--bd-x) * 0.6), var(--bd-y), 0); opacity: 1; }
+  91%      { transform: translate3d(calc(var(--bd-x) * 0.85), calc(var(--bd-y) * 0.7), 0); }
+  97%      { transform: translate3d(var(--bd-x), calc(var(--bd-y) * 0.15), 0); opacity: 0; }
+  100%     { transform: translate3d(var(--bd-x), calc(var(--bd-y) * 0.15), 0); opacity: 0; }
+}
+
+/* --- 5. Brasas ascendentes con balanceo --- */
 .bgfx__ember {
   fill: #ffb347;
   opacity: 0;
@@ -125,6 +213,8 @@ html[data-theme='light'] .bgfx {
 /* --- Pantallas pequeñas: menos coste de filtro y partículas --- */
 @media (max-width: 640px) {
   .bgfx__ember:nth-child(n + 11) { display: none; }
+  .bgfx__burst:nth-child(n + 9),
+  .bgfx__burst--vein { display: none; }
   .bgfx__vein-core--branch,
   .bgfx__vein-pulse--branch,
   .bgfx__hotspot--branch { display: none; }
@@ -140,6 +230,11 @@ html[data-theme='light'] .bgfx {
   .bgfx__ember {
     animation: none;
   }
+
+  .bgfx__burst > * { animation: none; }
+  .bgfx__dome { animation: none; }
+  .bgfx__bubble,
+  .bgfx__dome { opacity: 0.8; transform: scale(0.8); }
 
   .bgfx__vein-pulse { display: none; }
   .bgfx__ember { opacity: 0.4; }
