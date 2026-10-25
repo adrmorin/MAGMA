@@ -25,6 +25,22 @@ html[data-theme='light'] .bgfx {
   block-size: 100%;
 }
 
+/* Velo sobre la columna de contenido (.container, 1200px): el magma queda de
+   fondo y no compite con el texto; en los márgenes laterales se ve con fuerza. */
+.bgfx::after {
+  --bgfx-veil: color-mix(in srgb, var(--color-bg-deep, #060709) 80%, transparent);
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent calc(50% - 720px),
+    var(--bgfx-veil) calc(50% - 600px),
+    var(--bgfx-veil) calc(50% + 600px),
+    transparent calc(50% + 720px)
+  );
+}
+
 /* --- 1. Resplandor térmico que respira --- */
 .bgfx__haze {
   animation: bgfx-breathe 9s ease-in-out infinite;
