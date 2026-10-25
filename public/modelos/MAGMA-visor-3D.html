@@ -31,13 +31,13 @@ const VISOR_TRANS = {
     legendNote: "Intercambio conceptual: azul ↓ fluido frío · naranja ↑ fluido calentado · flechas radiales: calor del terreno. Trayectorias interiores conceptuales alineadas con las conexiones; fondo del pozo: 90 °C (dato del usuario); profundidad comprimida, ≈500 m según referencia, no validada.",
     eqSelectAria: "Seleccionar equipo",
     eqAll: "Conjunto completo",
-    eq0: "1 · DBHE-HE-2000",
+    eq0: "Sistema térmico de pozo",
     eq1: "2 · MVSM-2000",
     eq2: "3 · MGT-2000",
     eq3: "4 · SAC-2000",
     eq4: "5 · BOMBA-2000",
     eq5: "6 · Gemelo digital",
-    btnTerminal: "Detalle del intercambiador",
+    btnTerminal: "Vista protegida",
     lblCut: "Corte del terreno",
     lblExchange: "Animar intercambio térmico",
     lblNotes: "Señales y flechas",
@@ -45,9 +45,9 @@ const VISOR_TRANS = {
     btnNear: "Acercar",
     btnFar: "Alejar",
     detailAll: "Arrastra para girar · Rueda o gesto de pinza para acercar · Selecciona un equipo para inspeccionarlo.",
-    detailTerminal: "DBHE-HE-2000 · Detalle del dispositivo termodinámico de pozo profundo.",
+    detailTerminal: "El detalle del sistema térmico de pozo no está disponible en esta vista pública.",
     details: [
-      "DBHE-HE-2000 · Ambas conexiones atraviesan la tapa superior: salida de gas por el tubo alto centrado en la tapa y entrada de fluido azul por el tubo bajo. Proporciones aproximadas; tramo subterráneo comprimido.",
+      "Sistema térmico de pozo · Representación conceptual genérica, sin geometría constructiva ni escala dimensional.",
       "MVSM-2000 · Recipiente de acondicionamiento propuesto. Estados del fluido y función interna pendientes de definición.",
       "MGT-2000 · Entrada de gas por la boquilla frontal; salida superior hacia SAC-2000. Potencia bruta y condiciones de expansión pendientes de cálculo.",
       "SAC-2000 · Condensación por demostrar. Cámara flash, aeroacústica, función del CO₂, sumidero térmico y consumos pendientes de validación.",
@@ -81,13 +81,13 @@ const VISOR_TRANS = {
     legendNote: "Conceptual exchange: blue ↓ cold fluid · orange ↑ heated fluid · radial arrows: ground heat. Conceptual interior paths aligned with connections; borehole bottom: 90 °C (user data); compressed depth, ≈500 m according to reference, unvalidated.",
     eqSelectAria: "Select equipment",
     eqAll: "Full Assembly",
-    eq0: "1 · DBHE-HE-2000",
+    eq0: "Borehole thermal system",
     eq1: "2 · MVSM-2000",
     eq2: "3 · MGT-2000",
     eq3: "4 · SAC-2000",
     eq4: "5 · PUMP-2000",
     eq5: "6 · Digital Twin",
-    btnTerminal: "Exchanger Detail",
+    btnTerminal: "Protected view",
     lblCut: "Borehole Cutaway",
     lblExchange: "Animate Thermal Exchange",
     lblNotes: "Signals & Arrows",
@@ -95,9 +95,9 @@ const VISOR_TRANS = {
     btnNear: "Zoom In",
     btnFar: "Zoom Out",
     detailAll: "Drag to rotate · Scroll or pinch to zoom · Select an equipment to inspect.",
-    detailTerminal: "DBHE-HE-2000 · Deep borehole thermodynamic device detail.",
+    detailTerminal: "The detailed borehole thermal system is not available in this public view.",
     details: [
-      "DBHE-HE-2000 · Both connections pass through top cover: gas outlet via high centered tube and blue fluid inlet via low tube. Approximate proportions; underground section compressed.",
+      "Borehole thermal system · Generic conceptual representation without construction geometry or dimensional scale.",
       "MVSM-2000 · Proposed conditioning vessel. Fluid states and internal function subject to final definition.",
       "MGT-2000 · Gas inlet via front nozzle; top outlet towards SAC-2000. Gross power and expansion parameters pending calculation.",
       "SAC-2000 · Condensation to be demonstrated. Flash chamber, aeroacoustics, CO₂ role, heat sink, and consumption pending validation.",
@@ -192,9 +192,6 @@ function applyVisorLanguage(lang) {
     }
   }
 
-  const btnTerminal = document.getElementById('terminal-detail');
-  if (btnTerminal) btnTerminal.textContent = t.btnTerminal;
-
   const btnPlay = document.getElementById('play');
   if (btnPlay) {
     const isPlaying = btnPlay.getAttribute('aria-pressed') === 'true';
@@ -282,7 +279,7 @@ if (document.readyState === 'loading') {
   </ul>
 </div><div id="status">Preparando materiales y modelo…</div><div id="labels" aria-hidden="true"></div></div>
 <div class="legend"><span><i style="background:#eb7f22"></i>Fluido caliente previsto</span><span><i style="background:#268fcd"></i>Retorno líquido por verificar</span><span><i style="background:#f1b742"></i>Ruta eléctrica conceptual</span></div>
-<p style="margin:8px 28px;color:#c1d1d8;font-size:12px">Intercambio conceptual: azul ↓ fluido frío · naranja ↑ fluido calentado · flechas radiales: calor del terreno. Trayectorias interiores conceptuales alineadas con las conexiones; fondo del pozo: 90 °C (dato del usuario); profundidad comprimida, ≈500 m según referencia, no validada.</p><nav aria-label="Controles del modelo"><select id="equipment" aria-label="Seleccionar equipo"><option value="all">Conjunto completo</option><option value="0">1 · DBHE-HE-2000</option><option value="1">2 · MVSM-2000</option><option value="2">3 · MGT-2000</option><option value="3">4 · SAC-2000</option><option value="4">5 · BOMBA-2000</option><option value="5">6 · Gemelo digital</option></select><button type="button" id="terminal-detail">Detalle del intercambiador</button><button type="button" id="play" aria-pressed="false">Animar recorrido previsto</button><label><input type="checkbox" id="cut" checked>Corte del terreno</label><label><input type="checkbox" id="exchange" checked>Animar intercambio térmico</label><label><input type="checkbox" id="notes">Señales y flechas</label><button id="rotate" type="button">Girar 30°</button><button id="near" type="button">Acercar</button><button id="far" type="button">Alejar</button></nav>
+<p style="margin:8px 28px;color:#c1d1d8;font-size:12px">Intercambio conceptual: azul ↓ fluido frío · naranja ↑ fluido calentado · flechas radiales: calor del terreno. Trayectorias interiores conceptuales alineadas con las conexiones; fondo del pozo: 90 °C (dato del usuario); profundidad comprimida, ≈500 m según referencia, no validada.</p><nav aria-label="Controles del modelo"><select id="equipment" aria-label="Seleccionar equipo"><option value="all">Conjunto completo</option><option value="0" disabled hidden>Sistema térmico de pozo</option><option value="1">2 · MVSM-2000</option><option value="2">3 · MGT-2000</option><option value="3">4 · SAC-2000</option><option value="4">5 · BOMBA-2000</option><option value="5">6 · Gemelo digital</option></select><button type="button" id="play" aria-pressed="false">Animar recorrido previsto</button><label><input type="checkbox" id="cut" checked>Corte del terreno</label><label><input type="checkbox" id="exchange" checked>Animar intercambio térmico</label><label><input type="checkbox" id="notes">Señales y flechas</label><button id="rotate" type="button">Girar 30°</button><button id="near" type="button">Acercar</button><button id="far" type="button">Alejar</button></nav>
 <p id="detail" aria-live="polite">Arrastra para girar · Rueda o gesto de pinza para acercar · Selecciona un equipo para inspeccionarlo.</p>
 </main>
 <footer>Geometría aproximada a partir del plano final. Profundidad comprimida y escala de visualización sin valor dimensional. SAC, cámara flash, aeroacústica, función del CO₂ y potencia neta pendientes de validación. La animación no representa caudales ni tiempos reales. El sentido físico de las conexiones de la bomba debe confirmarse.</footer>
@@ -3623,7 +3620,7 @@ const pulseHot=new T.MeshBasicMaterial({color:'#ffb45c'}),pulseCold=new T.MeshBa
   }
   function valve(g,p){cyl(g,p,.12,.22,cold);bar(g,[p[0]-.2,p[1]+.13,p[2]],[p[0]+.2,p[1]+.13,p[2]],.035,cold);}
   const units=[], labels=[];
-  const names=['DBHE-HE-2000','MVSM-2000','MGT-2000','SAC-2000','BOMBA-2000','Gemelo digital'];
+  const names=['Sistema_termico_pozo','MVSM-2000','MGT-2000','SAC-2000','BOMBA-2000','Gemelo digital'];
   function unit(i,p){const g=new T.Group();g.position.set(...p);g.userData.unit=i;g.name=names[i];model.add(g);units.push(g);return g;}
   const well=unit(0,[-10,0,0]);
   box(well,[0,.13,0],[1.9,.22,1.8]);
@@ -3746,21 +3743,12 @@ async function applyPBR(mat,asset,strength){
  mat.map=albedo;mat.normalMap=normal;mat.normalScale.set(strength,strength);mat.roughnessMap=rough;mat.aoMap=ao;mat.aoMapIntensity=.65;mat.bumpMap=null;mat.metalness=0;mat.roughness=1;mat.color.set('#ffffff');mat.needsUpdate=true;
 }
 const materialsReady=Promise.all([applyPBR(ground,'concrete_floor_01',.42),applyPBR(strata,'rock_boulder_cracked',.75)]).then(()=>{model.userData.revision='02 PBR';model.userData.textureSources=['Poly Haven concrete_floor_01 CC0','Poly Haven rock_boulder_cracked CC0'];});
-</script><script>// Exterior reconstructed from DBHE_HE_2000_exterior_render.png; unscaled.
-const exchanger=new T.Group();exchanger.name='DBHE_seccion_intercambio_referencia';well.add(exchanger);
-exchanger.userData={reference:'ADRIAN/DBHE_HE_2000_exterior_render.png',hiddenGeometry:'inferred',finCount:'12, circumferential continuation inferred'};
-const terminalSteel=steel.clone();terminalSteel.name='DBHE_acero_cepillado';terminalSteel.color.set('#9a9a96').convertSRGBToLinear();terminalSteel.roughness=.58;terminalSteel.envMapIntensity=.8;
-function annulus(y,outer,inner,h){const shape=new T.Shape();shape.absarc(0,0,outer,0,Math.PI*2,false);const hole=new T.Path();hole.absarc(0,0,inner,0,Math.PI*2,true);shape.holes.push(hole);const g=new T.ExtrudeGeometry(shape,{depth:h,bevelEnabled:false,curveSegments:64});g.rotateX(-Math.PI/2);return mesh(exchanger,g,terminalSteel,[0,y-h/2,0]);}
-function terminalFlange(y){annulus(y,.56,.20,.065);annulus(y-.082,.555,.20,.065);const gasket=cyl(exchanger,[0,y-.041,0],.551,.012,dark);for(let j=0;j<12;j++){const a=j*Math.PI/6,x=.502*Math.cos(a),z=.502*Math.sin(a);cyl(exchanger,[x,y+.043,z],.039,.013,terminalSteel);mesh(exchanger,new T.CylinderGeometry(.032,.032,.04,6),terminalSteel,[x,y+.068,z]);cyl(exchanger,[x,y-.11,z],.02,.08,terminalSteel);mesh(exchanger,new T.CylinderGeometry(.032,.032,.037,6),terminalSteel,[x,y-.123,z]);}}
-cyl(exchanger,[0,-4.32,0],.455,1.34,terminalSteel);
-cyl(exchanger,[0,-5.69,0],.418,1.35,terminalSteel);
-terminalFlange(-3.65);terminalFlange(-5.0);terminalFlange(-6.35);
-annulus(-3.60,.395,.37,.037);
-// Swept rectangular sections create broad, flat fins rather than round tubes.
-function finRibbon(name,sampler){const positions=[],uv=[],indices=[],N=48;for(let k=0;k<=N;k++){const t=k/N,{a,y,ri,ro}=sampler(t);for(const [radius,side] of [[ri,-1],[ro,-1],[ro,1],[ri,1]]){const half=.018;positions.push(Math.cos(a)*radius-Math.sin(a)*half*side,y,Math.sin(a)*radius+Math.cos(a)*half*side);uv.push(side<0?0:1,t);}}
-for(let k=0;k<N;k++)for(let j=0;j<4;j++){const a=k*4+j,b=k*4+(j+1)%4,c=b+4,d=a+4;indices.push(a,b,d,b,c,d);}indices.push(0,2,1,0,3,2,N*4,N*4+1,N*4+2,N*4,N*4+2,N*4+3);const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();const o=mesh(exchanger,g,terminalSteel,[0,0,0]);o.name=name;}
-for(let j=0;j<12;j++){const a=j*Math.PI/6;finRibbon('Aleta_plana_curva_'+j,t=>({a:a+.24*Math.sin(2*Math.PI*t),y:-5.12-1.12*t,ri:.417,ro:.558}));finRibbon('Aleta_inferior_retorno_'+j,t=>({a:a+.30*t,y:-6.44-.27*Math.sin(t*Math.PI/2),ri:.40*(1-t)+.055,ro:.54*(1-t)+.055}));}
-const cap=ball(exchanger,[0,-6.41,0],.418,terminalSteel);cap.scale.y=.58;
+</script><script>// Generic public representation without construction geometry or dimensional value.
+const exchanger=new T.Group();exchanger.name='Sistema_termico_pozo_generico';well.add(exchanger);
+exchanger.userData={engineeringStatus:'Public conceptual placeholder',scale:'Illustrative only'};
+const terminalSteel=steel.clone();terminalSteel.name='Acero_generico';terminalSteel.color.set('#9a9a96').convertSRGBToLinear();terminalSteel.roughness=.58;terminalSteel.envMapIntensity=.8;
+cyl(exchanger,[0,-5.02,0],.44,2.7,terminalSteel);
+const cap=ball(exchanger,[0,-6.39,0],.44,terminalSteel);cap.scale.y=.45;
 const exchangeVisual=new T.Group();exchangeVisual.name='Animacion_didactica_intercambio';scene.add(exchangeVisual);
 const heatPackets=[];
 for(let j=0;j<10;j++){
@@ -3836,7 +3824,7 @@ nameplate(gen,[.62,.78,.985],[.62,.22],['MGT-2000']);boltRing(gen,[-.85,1.45,1.4
 nameplate(gen,[0,.205,1.065],[2.1,.19],['MAGMA POWER PLANT']);
 nameplate(sac,[.1,.22,1.14],[2,.19],['SAC-2000']);
 nameplate(vessel,[0,2.4,.76],[.85,.27],['MAGMA','MVSM-2000']);
-nameplate(well,[0,.65,.56],[.73,.22],['DBHE-HE-2000']);
+nameplate(well,[0,.65,.56],[.73,.22],['MAGMA']);
 nameplate(control,[0,3.68,.59],[1.26,.24],['MAGMA AI']);
 nameplate(pump,[.5,.19,.77],[1.24,.18],['BOMBA-2000']);
 // More detailed flanges, support feet and service-side hardware.
@@ -3879,15 +3867,14 @@ function animateCommunication(now){const phase=(now*.00022)%(signalMaterial.dash
 const positions=[[-10,2.35,.5],[-6.6,4.55,.3],[-2,3.15,.6],[3.8,3.45,.5],[9,1.8,1.5],[8.4,4.4,-3.2]];
 const labelEls=positions.map((p,i)=>{const el=document.createElement('span');el.className='marker';el.textContent=i+1;document.getElementById('labels').appendChild(el);return el;});
 const details=[
-'DBHE-HE-2000 · Ambas conexiones atraviesan la tapa superior: salida de gas por el tubo alto centrado en la tapa y entrada de fluido azul por el tubo bajo. Proporciones aproximadas; tramo subterráneo comprimido.',
+'Sistema térmico de pozo · Representación conceptual genérica, sin geometría constructiva ni escala dimensional.',
 'MVSM-2000 · Recipiente de acondicionamiento propuesto. Estados del fluido y función interna pendientes de definición.',
 'MGT-2000 · Entrada de gas por la boquilla frontal; salida superior hacia SAC-2000. Potencia bruta y condiciones de expansión pendientes de cálculo.',
 'SAC-2000 · Condensación por demostrar. Cámara flash, aeroacústica, función del CO₂, sumidero térmico y consumos pendientes de validación.',
 'BOMBA-2000 · Retorno líquido por verificar. Aspiración, descarga y flechas del plano pendientes de confirmación; recorrido animado hipotético.',
 'Gemelo digital · Supervisión prevista. Pantalla sin valores numéricos para evitar presentar prestaciones inventadas.'
 ];
-function selectUnit(value){document.getElementById('equipment').value=value;document.getElementById('detail').textContent=value==='all'?VISOR_TRANS[currentVisorLang].detailAll:(VISOR_TRANS[currentVisorLang].details[+value]||VISOR_TRANS[currentVisorLang].detailAll);if(value==='all'){camera.zoom=1;camera.updateProjectionMatrix();controls.target.set(0,-2.7,0);const distance=Math.max(33,14.4/(Math.tan(Math.PI/12)*camera.aspect));camera.position.copy(controls.target).add(new T.Vector3(.2,.24,.95).normalize().multiplyScalar(distance));}else{const p=units[+value].position.clone();p.y=+value===0?-1.3:2;controls.target.copy(p);camera.position.copy(p).add(new T.Vector3(4.5,3.2,+value===0?15:9));}controls.update();}
-document.getElementById('terminal-detail').onclick=()=>{document.getElementById('equipment').selectedIndex=-1;document.getElementById('cut').checked=true;earthBack.visible=true;covered.visible=false;controls.target.set(-10,-5.12,0);camera.position.set(-7.7,-3.85,6.4);controls.update();document.getElementById('detail').textContent='DBHE-HE-2000 · Detalle del dispositivo terminal: cuerpo, bridas, aletas planas curvadas y remate inferior. Reconstrucción visual sin escala; partes ocultas inferidas.';};
+function selectUnit(value){if(value==='0')value='all';document.getElementById('equipment').value=value;document.getElementById('detail').textContent=value==='all'?VISOR_TRANS[currentVisorLang].detailAll:(VISOR_TRANS[currentVisorLang].details[+value]||VISOR_TRANS[currentVisorLang].detailAll);if(value==='all'){camera.zoom=1;camera.updateProjectionMatrix();controls.target.set(0,-2.7,0);const distance=Math.max(33,14.4/(Math.tan(Math.PI/12)*camera.aspect));camera.position.copy(controls.target).add(new T.Vector3(.2,.24,.95).normalize().multiplyScalar(distance));}else{const p=units[+value].position.clone();p.y=2;controls.target.copy(p);camera.position.copy(p).add(new T.Vector3(4.5,3.2,9));}controls.update();}
 controls.addEventListener('start',()=>{document.getElementById('equipment').selectedIndex=-1;});
 document.getElementById('equipment').onchange=e=>selectUnit(e.target.value);document.getElementById('home').onclick=()=>selectUnit('all');
 document.getElementById('cut').onchange=e=>{earthBack.visible=e.target.checked;covered.visible=!e.target.checked;heat.visible=e.target.checked;};
@@ -3947,7 +3934,7 @@ function render(now){updateExchange(now);animateCommunication(now);const dt=Math
 async function exportGLB(){await Promise.all([brandReady,materialsReady]);const exportScene=new T.Scene();exportScene.name='MAGMA';setWellGhost(false);const copy=model.clone(true);setWellGhost(exchangeVisual.visible);exportScene.add(copy);copy.traverse(o=>{if(o.name==='Ruta_electrica_conceptual')o.userData.conceptual=true;});return new Promise(resolve=>new T.GLTFExporter().parse(exportScene,resolve,{binary:true,onlyVisible:true,embedImages:true,maxTextureSize:2048}));}
 const expBtn=document.getElementById('export');if(expBtn){expBtn.onclick=async()=>{expBtn.disabled=true;expBtn.textContent='Preparando GLB…';try{const data=await exportGLB(),url=URL.createObjectURL(new Blob([data],{type:'model/gltf-binary'}));const a=document.createElement('a');a.href=url;a.download='MAGMA-proceso-v17.glb';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}finally{expBtn.disabled=false;expBtn.textContent='Guardar modelo GLB';}};}
 window.MAGMA={scene,model,camera,renderer,controls,exportGLB,selectUnit,units};
-resize();selectUnit('all');if(new URLSearchParams(location.search).get('view')==='terminal')document.getElementById('terminal-detail').click();Promise.all([brandReady,materialsReady]).then(()=>{document.getElementById('status').remove();document.body.dataset.ready='true';}).catch(()=>{document.getElementById('status').textContent='No se han podido cargar todas las texturas.';});requestAnimationFrame(render);
+resize();selectUnit('all');Promise.all([brandReady,materialsReady]).then(()=>{document.getElementById('status').remove();document.body.dataset.ready='true';}).catch(()=>{document.getElementById('status').textContent='No se han podido cargar todas las texturas.';});requestAnimationFrame(render);
 
 
 

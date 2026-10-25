@@ -158,7 +158,7 @@
   <header class="top">
     <div>
       <p class="kicker">Global Energy Data</p>
-      <h1 id="map-title">Mapa de activos<span>49 plantas renovables de referencia a nivel mundial · coordenadas aproximadas, pendientes de validar contra Global Energy Monitor</span></h1>
+      <h1 id="map-title">Mapa de activos<span>Vista de referencia de 49 plantas renovables · ubicaciones aproximadas, no aptas para navegación ni análisis técnico</span></h1>
     </div>
     <div class="themes">
       <b id="theme-label">Tema</b>
@@ -197,7 +197,7 @@ const MAP_LANGUAGE = new URLSearchParams(location.search).get("lang") === "en" ?
 const MAP_ENGLISH = MAP_LANGUAGE === "en";
 document.documentElement.lang = MAP_LANGUAGE;
 if (MAP_ENGLISH) {
-  document.getElementById("map-title").innerHTML = "Asset map<span>49 benchmark renewable plants worldwide · approximate coordinates pending validation against Global Energy Monitor</span>";
+  document.getElementById("map-title").innerHTML = "Asset map<span>Reference view of 49 renewable plants · approximate locations, not for navigation or technical analysis</span>";
   document.getElementById("theme-label").textContent = "Theme";
   document.querySelector('[data-theme="claro"]').textContent = "Light";
   document.querySelector('[data-theme="tinta"]').textContent = "Ink";
@@ -215,7 +215,7 @@ if (MAP_ENGLISH) {
  *
  * `lat`/`lng` NO vienen de ese archivo (solo trae país/región): son una
  * aproximación geográfica añadida para poder dibujar el mapa, marcada
- * como `coordsConfidence: "aproximada"` — pendiente de validar contra
+ * como `coordsConfidence: "aproximada"` — utilizada solo como referencia
  * Global Energy Monitor, que sí publica coordenadas reales planta por
  * planta. "Jichuan Solar Park" tiene `coordsConfidence: "sin_confirmar"`
  * y `lat`/`lng` null porque la fuente ni siquiera confirma su región
@@ -513,7 +513,7 @@ function renderMarkers() {
           `Fuente: ${d.source}`,
         ];
         if (d.coordsConfidence === "aproximada") {
-          lines.push("Ubicación aproximada — pendiente de validar contra Global Energy Monitor.");
+          lines.push("Ubicación aproximada — vista de referencia, no apta para navegación ni análisis técnico.");
         }
         showPop(x, y, meta.label, d.name, lines);
       })

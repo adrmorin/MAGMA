@@ -21,7 +21,6 @@ import {
   Menu, 
   X, 
   Calendar, 
-  Clock, 
   ChevronRight, 
   ChevronLeft, 
   Download, 
@@ -42,6 +41,8 @@ const getAssetUrl = (path) => {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${base}${cleanPath}`;
 };
+
+const FRANCHISES_ENABLED = false;
 
 export default function App() {
   // Iluminación de botones bajo el cursor
@@ -100,7 +101,10 @@ export default function App() {
 
   // Booking Form State
   const [selectedService, setSelectedService] = useState('Energía Solar');
-  const [selectedDate, setSelectedDate] = useState(17); // Default August 17, 2026
+  const today = new Date();
+  const calendarYear = today.getFullYear();
+  const calendarMonth = today.getMonth();
+  const [selectedDate, setSelectedDate] = useState(today.getDate());
   const [selectedTime, setSelectedTime] = useState(null);
   const [bookingEmail, setBookingEmail] = useState('');
   const [bookingNotes, setBookingNotes] = useState('');
@@ -121,9 +125,6 @@ export default function App() {
 
   // Franchise Roadmap Active Phase State
   const [activePhase, setActivePhase] = useState(1);
-
-  // Franchise Joint Venture Selection State
-  const [selectedJvId, setSelectedJvId] = useState(1);
 
   React.useEffect(() => {
     const handleMessage = (e) => {
@@ -151,14 +152,26 @@ export default function App() {
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [theme]);
+  }, [theme, lang]);
 
-  // Interactive booking calendar details
-  const daysInAugust = Array.from({ length: 31 }, (_, i) => i + 1);
-  // August 2026 starts on Saturday (so Saturday=1, Sunday=2, Monday=3, etc.)
-  // Let's create empty spaces for alignment. Saturday is day 6 of week.
-  const emptyDaysBefore = Array.from({ length: 5 }, () => null); // Monday to Friday empty offset
-  const calendarCells = [...emptyDaysBefore, ...daysInAugust];
+  // Calendar always follows the visitor's current month.
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
+  const mondayBasedOffset = (firstDayOfMonth + 6) % 7;
+  const emptyDaysBefore = Array.from({ length: mondayBasedOffset }, () => null);
+  const calendarCells = [
+    ...emptyDaysBefore,
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1)
+  ];
+  const calendarMonthLabel = new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'es-ES', {
+    month: 'long',
+    year: 'numeric'
+  }).format(today);
+  const formattedSelectedDate = new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(new Date(calendarYear, calendarMonth, selectedDate));
 
   const timeSlots = [
     "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", 
@@ -194,7 +207,7 @@ export default function App() {
     }
   ];
 
-  const jvData = [
+  const _jvData = [
     {
       id: 1,
       name: "JV North America",
@@ -316,8 +329,6 @@ export default function App() {
     }
   ];
 
-  const activeJv = jvData.find(jv => jv.id === selectedJvId);
-
   const handleBookingSubmit = (e) => {
     e.preventDefault();
     if (!bookingEmail || !selectedTime) {
@@ -330,20 +341,6 @@ export default function App() {
   const handleContactSubmit = (e) => {
     e.preventDefault();
     setContactSuccess(true);
-  };
-
-  const handleJvContactClick = (jvName, centerName) => {
-    setContactForm({
-      firstName: '',
-      lastName: '',
-      email: '',
-      area: 'Alianzas Comerciales',
-      message: `Hola, estoy interesado en recibir más detalles sobre el modelo de franquicia tecnológica y el ecosistema de alianzas para ${jvName} (${centerName}).`
-    });
-    // Navigate to Contactos tab and scroll to top smoothly
-    setActiveTab('contactos');
-    setMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const resetBooking = () => {
@@ -383,7 +380,7 @@ export default function App() {
       <header className="mpp-header">
         <div className="container mpp-header__container">
           <div className="mpp-header__brand" onClick={() => navigateTo('inicio')}>
-            <img src={theme === 'dark' ? getAssetUrl('/logo-horizontal-white.png') : getAssetUrl('/logo-horizontal-color.png')} alt="MAGMA POWER PLANT" className="mpp-header__logo" width="240" height="90" fetchpriority="high" decoding="async" />
+            <img src={theme === 'dark' ? getAssetUrl('/logo-horizontal-white.png') : getAssetUrl('/logo-horizontal-color.png')} alt="MAGMA POWER PLANT" className="mpp-header__logo" width="240" height="90" fetchPriority="high" decoding="async" />
           </div>
 
           {/* Desktop Nav */}
@@ -393,7 +390,6 @@ export default function App() {
             <button className={`mpp-nav-link ${activeTab === 'tecnologia' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('tecnologia')}>{t('nav_tecnologia')}</button>
             <button className={`mpp-nav-link ${activeTab === 'servicios' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('servicios')}>{t('nav_servicios')}</button>
             <button className={`mpp-nav-link ${activeTab === 'equipo' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('equipo')}>{t('nav_equipo')}</button>
-            <button className={`mpp-nav-link ${activeTab === 'franquicias' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('franquicias')}>{t('nav_franquicias')}</button>
             <button className={`mpp-nav-link ${activeTab === 'mugara' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('mugara')}>{t('nav_mugara')}</button>
             <button className={`mpp-nav-link ${activeTab === 'contactos' ? 'mpp-nav-link--active' : ''}`} onClick={() => navigateTo('contactos')}>{t('nav_contactos')}</button>
           </nav>
@@ -424,7 +420,6 @@ export default function App() {
             <button className={`mpp-nav-mobile-link ${activeTab === 'tecnologia' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('tecnologia')}>{t('nav_tecnologia')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'servicios' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('servicios')}>{t('nav_servicios')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'equipo' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('equipo')}>{t('nav_equipo')}</button>
-            <button className={`mpp-nav-mobile-link ${activeTab === 'franquicias' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('franquicias')}>{t('nav_franquicias')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'mugara' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('mugara')}>{t('nav_mugara')}</button>
             <button className={`mpp-nav-mobile-link ${activeTab === 'contactos' ? 'mpp-nav-mobile-link--active' : ''}`} onClick={() => navigateTo('contactos')}>{t('nav_contactos')}</button>
           </nav>
@@ -460,7 +455,7 @@ export default function App() {
 
                 <div className="mpp-hero__image-wrapper">
                   <div className="mpp-hero__image-card">
-                    <img src={getAssetUrl('/logo-3d-transparent.png')} alt="Magma Power Plant 3D Logo" className="mpp-hero__logo-3d" width="360" height="360" fetchpriority="high" decoding="async" />
+                    <img src={getAssetUrl('/logo-3d-transparent.png')} alt="Magma Power Plant 3D Logo" className="mpp-hero__logo-3d" width="360" height="360" fetchPriority="high" decoding="async" />
                     <div className="mpp-hero__badge">
                       <ShieldCheck size={20} className="color-forest" />
                       <span>{t('hero_badge')}</span>
@@ -473,13 +468,13 @@ export default function App() {
             {/* Interactive 3D Model Section on Home */}
             <div className="container section animate-fade">
               <div className="mpp-section-header">
-                <span className="mpp-section-subtitle">VISUALIZACIÓN INTERACTIVA 3D</span>
+                <span className="mpp-section-subtitle">VISIÓN GENERAL DEL SISTEMA</span>
                 <h2 className="mpp-section-title">Sistema de Proceso Geomagmático MAGMA</h2>
                 <p className="mpp-section-desc">
-                  Explore en tiempo real la arquitectura 3D del pozo profundo, intercambiadores de calor, turbogenerador MGT y corte geológico.
+                  Conozca el recorrido conceptual de la energía en un circuito cerrado, desde la fuente térmica hasta la generación eléctrica.
                 </p>
               </div>
-              <SistemaMagma height="750px" lang={lang} />
+              <div className="mpp-card"><p>{t('visor_benefits_intro')}</p></div>
             </div>
 
             {/* Impact section */}
@@ -659,7 +654,7 @@ export default function App() {
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-text-heading, #ffffff)', margin: 0 }}>
                   Modelo y Visor 3D Interactivo — Planta MAGMA
                 </h3>
-                <span className="mpp-hero__tag" style={{ margin: 0 }}>Texturizado PBR v17</span>
+                <span className="mpp-hero__tag" style={{ margin: 0 }}>Vista conceptual protegida</span>
               </div>
               <SistemaMagma height="720px" lang={lang} />
             </div>
@@ -668,7 +663,7 @@ export default function App() {
               <div className="mpp-tech-text-block">
                 <h3>{t('tech_system_title')}</h3>
                 <p>
-                  Nuestro sistema de **ciclo binario** aprovecha el calor de la fuente termal mediante **intercambiadores de calor de pozo profundo**, transformándolo en electricidad o calor industrial de forma continua, limpia y eficiente.
+                  Nuestro sistema de ciclo binario aprovecha el calor de la fuente termal mediante intercambiadores de calor de pozo profundo, transformándolo en electricidad o calor industrial de forma continua, limpia y eficiente.
                 </p>
                 <p className="mt-4">
                   {t('tech_p2')}
@@ -689,12 +684,12 @@ export default function App() {
               <h3 className="mpp-specs-title">Características Principales de Nuestras Plantas</h3>
               <div className="grid mpp-grid-3 mpp-specs-grid">
                 <div className="mpp-spec-item">
-                  <span className="mpp-spec-num">50 MW</span>
+                  <span className="mpp-spec-num">Modular</span>
                   <h4>{t('spec_orc_title')}</h4>
                   <p>{t('spec_orc_desc')}</p>
                 </div>
                 <div className="mpp-spec-item">
-                  <span className="mpp-spec-num">450 MW</span>
+                  <span className="mpp-spec-num">Escalable</span>
                   <h4>{t('spec_trad_title')}</h4>
                   <p>{t('spec_trad_desc')}</p>
                 </div>
@@ -709,12 +704,12 @@ export default function App() {
                   <p>{t('spec_range_desc')}</p>
                 </div>
                 <div className="mpp-spec-item">
-                  <span className="mpp-spec-num">0%</span>
+                  <span className="mpp-spec-num">Sin combustión</span>
                   <h4>{t('spec_emissions_title')}</h4>
                   <p>{t('spec_emissions_desc')}</p>
                 </div>
                 <div className="mpp-spec-item">
-                  <span className="mpp-spec-num">100k+</span>
+                  <span className="mpp-spec-num">A medida</span>
                   <h4>{t('spec_homes_title')}</h4>
                   <p>{t('spec_homes_desc')}</p>
                 </div>
@@ -788,7 +783,7 @@ export default function App() {
                     </div>
                     <h4>¡Cita Solicitada Exitosamente!</h4>
                     <p>
-                      Hemos registrado su solicitud para el servicio de <strong>{selectedService}</strong> el día <strong>{selectedDate} de Agosto de 2026</strong> a las <strong>{selectedTime}</strong>.
+                      Hemos registrado su solicitud para el servicio de <strong>{selectedService}</strong> el <strong>{formattedSelectedDate}</strong> a las <strong>{selectedTime}</strong>.
                     </p>
                     <p className="text-sm">
                       Se ha enviado un correo con los detalles y el enlace de la reunión a: <strong>{bookingEmail}</strong>.
@@ -821,7 +816,7 @@ export default function App() {
                           <label className="mpp-form-label">{t('scheduler_label_day')}</label>
                           <div className="mpp-calendar">
                             <div className="mpp-calendar__header">
-                              <span className="mpp-calendar__title">Agosto 2026</span>
+                              <span className="mpp-calendar__title" style={{ textTransform: 'capitalize' }}>{calendarMonthLabel}</span>
                             </div>
                             <div className="mpp-calendar__grid">
                               {/* Day labels */}
@@ -839,8 +834,8 @@ export default function App() {
                                   return <span key={`empty-${index}`} className="mpp-calendar__day--disabled"></span>;
                                 }
 
-                                const isToday = day === 16; // Simulated current date: 16 Aug 2026
-                                const isPast = day < 16;
+                                const isToday = day === today.getDate();
+                                const isPast = day < today.getDate();
                                 const isSelected = selectedDate === day;
 
                                 return (
@@ -955,7 +950,7 @@ export default function App() {
         )}
 
         {/* TAB: FRANQUICIAS */}
-        {activeTab === 'franquicias' && (
+        {FRANCHISES_ENABLED && activeTab === 'franquicias' && (
           <section className="container section animate-fade">
             <div className="mpp-section-header">
               <span className="mpp-section-subtitle">{t('franchise_subtitle')}</span>
@@ -1034,7 +1029,7 @@ export default function App() {
                     <h4>{t('phase2_title')}</h4>
                     <span className="mpp-roadmap-duration">{t('phase2_duration')}</span>
                     <p className="mt-2">
-                      <strong>{t('phase1_goal')}</strong> Crear turbogeneradores optimizados para bajas y medias entalpías, con diseños modulares compactos, alta durabilidad física y una eficiencia de conversión superior al 20% en condiciones reales de operación.
+                      <strong>{t('phase1_goal')}</strong> Estudiar turbogeneradores para bajas y medias entalpías mediante diseños modulares sujetos a validación técnica.
                     </p>
                     <p className="mt-2">
                       <strong>{t('phase1_key')}</strong> {t('phase2_key_text')}
@@ -1289,7 +1284,7 @@ export default function App() {
                     <Phone className="color-electric" size={24} />
                     <div>
                       <h5>{t('contact_phone_title')}</h5>
-                      <p><a href="tel:+12399610133">+1 (239) 961-0133</a></p>
+                      <p><a href="tel:+12399610175">+1 (239) 961-0175</a></p>
                     </div>
                   </div>
 
@@ -1322,7 +1317,6 @@ export default function App() {
               <button onClick={() => navigateTo('tecnologia')}>{t('nav_tecnologia')}</button>
               <button onClick={() => navigateTo('servicios')}>{t('nav_servicios')}</button>
               <button onClick={() => navigateTo('equipo')}>{t('nav_equipo')}</button>
-              <button onClick={() => navigateTo('franquicias')}>{t('nav_franquicias')}</button>
               <button onClick={() => navigateTo('mugara')}>{t('nav_mugara')}</button>
               <button onClick={() => navigateTo('contactos')}>{t('nav_contactos')}</button>
             </div>
@@ -1331,7 +1325,7 @@ export default function App() {
             <h5>Contacto</h5>
             <p>Naples, Florida, Estados Unidos</p>
             <p className="text-sm">Email: mpp.info@magmapowerplant.com</p>
-            <p className="text-sm">Telf: +1 (239) 961-0133</p>
+            <p className="text-sm">Telf: +1 (239) 961-0175</p>
           </div>
         </div>
         <div className="mpp-footer__bottom">

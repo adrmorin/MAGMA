@@ -23,10 +23,10 @@ export const translations = {
     // Impact Section
     impact_subtitle: "NUESTRO IMPACTO",
     impact_title: "Soluciones Eficientes de Alto Impacto",
-    impact_desc: "Garantizamos rentabilidad económica protegiendo el medioambiente.",
+    impact_desc: "Impulsamos la eficiencia energética con responsabilidad medioambiental.",
     
     impact_card1_title: "Reducción de Costos",
-    impact_card1_text: "En MAGMA POWER PLANT, ayudamos a las empresas a reducir costos a través de una gestión energética eficiente. Nuestras soluciones están diseñadas para maximizar el ahorro y la rentabilidad desde el primer día.",
+    impact_card1_text: "En MAGMA POWER PLANT, ayudamos a las empresas a identificar oportunidades de eficiencia energética y reducción de costos mediante soluciones adaptadas a cada proyecto.",
     
     impact_card2_title: "Energía Renovable",
     impact_card2_text: "Fomentamos el uso de energías renovables integrando fuentes limpias en sus operaciones diarias. Implementamos tecnología avanzada para aprovechar el calor y la luz de forma responsable.",
@@ -39,10 +39,10 @@ export const translations = {
     company_title: "La Compañía",
     company_desc: "Innovando en el aprovechamiento de recursos terrestres desde 2018.",
     company_intro_title: "Transformamos la visión en energía global",
-    company_intro_p1: "Desde 2018, **MAGMA POWER PLANT** ofrece soluciones energéticas sostenibles y competitivas a nivel global. Desarrollamos un proceso innovador orientado al aprovechamiento del calor interno de la Tierra mediante un **sistema cerrado de transferencia energética**, en el cual únicamente se intercambia calor con la fuente termal, sin extracción ni inyección de materia en el subsuelo.",
+    company_intro_p1: "Desde 2018, MAGMA POWER PLANT ofrece soluciones energéticas sostenibles y competitivas a nivel global. Desarrollamos un proceso innovador orientado al aprovechamiento del calor interno de la Tierra mediante un sistema cerrado de transferencia energética, en el cual únicamente se intercambia calor con la fuente termal, sin extracción ni inyección de materia en el subsuelo.",
     company_intro_p2: "Este principio representa una diferencia fundamental respecto a los sistemas geotérmicos convencionales, donde el agua o vapor son extraídos de los reservorios para accionar turbinas, generando alteraciones en el equilibrio hidrotermal y posibles riesgos ambientales asociados a la reinyección, residuos o fugas.",
     company_science_title: "El Fundamento Científico",
-    company_science_text: "El proceso radica en el intercambio de calor en la **franja térmica de trabajo efectiva**, definida como el gradiente térmico utilizable originado por la disipación de energía desde el magma hacia su entorno inmediato (rocas, fluidos o vapor). El calor se transfiere mediante conducción, convección y radiación a un fluido de trabajo de baja entalpía en un circuito cerrado, el cual alimenta un turbogenerador ORC (Organic Rankine Cycle), convirtiendo el calor profundo en electricidad sin comprometer el medio geológico.",
+    company_science_text: "El proceso radica en el intercambio de calor en la franja térmica de trabajo efectiva, definida como el gradiente térmico utilizable originado por la disipación de energía desde el magma hacia su entorno inmediato (rocas, fluidos o vapor). El calor se transfiere mediante conducción, convección y radiación a un fluido de trabajo de baja entalpía en un circuito cerrado, el cual alimenta un turbogenerador ORC (Organic Rankine Cycle), convirtiendo el calor profundo en electricidad sin comprometer el medio geológico.",
     company_quote_title: "Energía Geomagmática:",
     company_quote_text: "\"La forma de energía renovable obtenida mediante el proceso de extracción del calor interno de la tierra sin importar el estado de la materia de la fuente que lo contenga a través de un sistema termodinámicamente cerrado lo que evita el intercambio de materia con la fuente.\"",
 
@@ -83,23 +83,23 @@ export const translations = {
     tech_title: "Nuestra Tecnología",
     tech_desc: "Ciclos termodinámicos binarios y turbogeneradores diseñados a medida.",
     tech_system_title: "El Sistema de Ciclo Binario y ORC",
-    tech_p1: "Nuestro sistema de **ciclo binario** aprovecha el calor de la fuente termal mediante **intercambiadores de calor de pozo profundo**, transformándolo en electricidad o calor industrial de forma continua, limpia y eficiente.",
-    tech_p2: "Diseñamos plantas ORC de hasta **50 MW**, equipadas con turbinas especiales y extractores de calor de ciclo binario diseñados a medida, que optimizan la transferencia de calor utilizando fluidos de trabajo orgánicos. Además, contamos con modelos de planta de vapor geotérmico tradicional de hasta **450 MW** para suministros continuos de gran escala.",
-    tech_p3: "Podemos integrar este ciclo a un ciclo de vapor tradicional para obtener un **potente ciclo combinado** que aumenta significativamente la eficiencia global de la planta de energía con una mínima huella en la superficie.",
+    tech_p1: "Nuestro sistema de ciclo binario aprovecha el calor de la fuente termal mediante intercambiadores de calor de pozo profundo, transformándolo en electricidad o calor industrial de forma continua, limpia y eficiente.",
+    tech_p2: "Diseñamos configuraciones ORC modulares con turbinas y sistemas de transferencia térmica adaptados a las condiciones de cada proyecto. También estudiamos configuraciones geotérmicas convencionales para aplicaciones de mayor escala.",
+    tech_p3: "Podemos integrar este ciclo a un ciclo de vapor tradicional para obtener un potente ciclo combinado que aumenta significativamente la eficiencia global de la planta de energía con una mínima huella en la superficie.",
     tech_specs_title: "Características Principales de Nuestras Plantas",
     
     spec_orc_title: "Plantas ORC Modulares",
     spec_orc_desc: "Unidades modulares fáciles de integrar en pozos térmicos profundos y adaptables a las condiciones reales.",
     spec_trad_title: "Capacidad Tradicional",
-    spec_trad_desc: "Plantas de vapor tradicionales de gran envergadura para satisfacer demandas industriales masivas.",
+    spec_trad_desc: "Configuraciones geotérmicas estudiadas según el recurso disponible y la demanda del proyecto.",
     spec_ops_title: "Operación Continua",
     spec_ops_desc: "Producción estable de carga base, independiente de las condiciones climáticas o la hora del día.",
     spec_range_title: "Rango Térmico",
     spec_range_desc: "Excelente rendimiento térmico optimizado para recursos geotérmicos de baja y media entalpía.",
     spec_emissions_title: "Emisiones Directas",
-    spec_emissions_desc: "Operación termodinámica limpia sin combustibles fósiles y con mínima huella hídrica.",
-    spec_homes_title: "Hogares Abastecidos",
-    spec_homes_desc: "Suministro de electricidad suficiente para abastecer ciudades enteras de manera sostenible.",
+    spec_emissions_desc: "Operación termodinámica sin combustión en el circuito de generación.",
+    spec_homes_title: "Diseño por Proyecto",
+    spec_homes_desc: "Dimensionamiento sujeto al recurso térmico, la demanda y los estudios de viabilidad.",
 
     // Services Section
     services_subtitle: "QUÉ HACEMOS",
@@ -107,7 +107,7 @@ export const translations = {
     services_desc: "Cubrimos todo el ciclo de diseño, instalación, operación y mantenimiento.",
     
     service1_title: "1. Plantas de Energía Solar",
-    service1_desc: "Diseño, desarrollo y gestión integral de plantas de energía solar. Ofrecemos estudios de factibilidad, instalación, operación y mantenimiento para maximizar la rentabilidad de su inversión solar y reducir la huella de carbono.",
+    service1_desc: "Diseño, desarrollo y gestión integral de plantas de energía solar. Ofrecemos estudios de factibilidad, instalación, operación y mantenimiento orientados a la eficiencia energética y a la reducción de la huella de carbono.",
     
     service2_title: "2. Proyectos de Energía Geotermal",
     service2_desc: "Estudios de viabilidad del recurso, diseño avanzado de pozos profundos, e instalación de sistemas de ciclo binario ORC. Diseños a medida que optimizan los recursos de calor subterráneo para generación eléctrica estable.",
@@ -122,7 +122,7 @@ export const translations = {
     scheduler_title: "Hable con nosotros. Agende su cita",
     scheduler_subtitle: "Seleccione el servicio, la fecha y la hora para su cita virtual o en oficinas.",
     scheduler_label_service: "Tipo de servicio para su cita *",
-    scheduler_label_day: "Seleccione un día (Agosto 2026) *",
+    scheduler_label_day: "Seleccione un día del mes actual *",
     scheduler_label_hour: "Seleccione una hora disponible *",
     scheduler_label_email: "Correo electrónico *",
     scheduler_label_notes: "Comente brevemente su interés",
@@ -130,7 +130,7 @@ export const translations = {
     scheduler_btn_submit: "Reservar Cita",
     
     scheduler_success_title: "¡Cita Solicitada Exitosamente!",
-    scheduler_success_desc: "Hemos registrado su solicitud para el servicio de {service} el día {day} de Agosto de 2026 a las {time}.",
+    scheduler_success_desc: "Hemos registrado su solicitud para el servicio de {service} el {date} a las {time}.",
     scheduler_success_email: "Se ha enviado un correo con los detalles y el enlace de la reunión a: {email}.",
     scheduler_btn_reset: "Agendar otra cita",
 
@@ -138,7 +138,7 @@ export const translations = {
     team_subtitle: "PROFESIONALES EXPERTOS",
     team_title: "Nuestro Equipo",
     team_desc: "Contamos con un grupo multidisciplinario altamente comprometido.",
-    team_intro_p1: "El equipo de trabajo de **MAGMA POWER PLANT** está conformado por un grupo multidisciplinario de profesionales altamente capacitados y comprometidos con la excelencia. Integrado por especialistas en ingeniería, tecnología, automatización, gestión de proyectos, finanzas y seguridad industrial, aportamos nuestros conocimientos científicos y experiencia operativa para garantizar soluciones innovadoras y de alto rendimiento.",
+    team_intro_p1: "El equipo de trabajo de MAGMA POWER PLANT está conformado por un grupo multidisciplinario de profesionales altamente capacitados y comprometidos con la excelencia. Integrado por especialistas en ingeniería, tecnología, automatización, gestión de proyectos, finanzas y seguridad industrial, aportamos nuestros conocimientos científicos y experiencia operativa para garantizar soluciones innovadoras y de alto rendimiento.",
     team_intro_p2: "Cada miembro comparte una visión común orientada a la calidad, la sostenibilidad y la mejora continua, trabajando en estrecha colaboración para superar las metas de nuestros clientes y liderar la transición energética global.",
     
     team_card1_title: "Ingeniería y Termodinámica",
@@ -151,21 +151,21 @@ export const translations = {
     team_card4_text: "Análisis de rentabilidad estratégica para aliados, cumplimiento de normas y seguridad ambiental del subsuelo.",
 
     // Franchises Section
-    franchise_subtitle: "OPORTUNIDAD DE INVERSIÓN",
+    franchise_subtitle: "INFORMACIÓN EN REVISIÓN",
     franchise_title: "Franquicias en Energía Renovable",
-    franchise_desc: "Únete a un modelo de negocio altamente rentable y de gran proyección futura.",
+    franchise_desc: "Esta información no está disponible públicamente mientras se completa su revisión legal.",
     franchise_intro_h3: "¡Da el primer paso hacia el futuro de la energía!",
-    franchise_intro_p: "Si está listo para invertir de manera segura en un modelo de alto rendimiento, le ofrecemos acceso exclusivo a nuestro esquema de Joint Ventures y Franquicias Tecnológicas globales. Disponemos de condiciones iniciales preferenciales para socios estratégicos fundadores.",
+    franchise_intro_p: "Para consultas institucionales, utilice el formulario de contacto.",
     franchise_docs_title: "Documentación Oficial del Proyecto:",
-    franchise_doc_cert: "Certificado de Franquicia (Demo)",
-    franchise_doc_protocol: "Protocolo de Franquicia (PDF)",
+    franchise_doc_cert: "Documento no disponible",
+    franchise_doc_protocol: "Documento no disponible",
     
     franchise_map_subtitle: "ECOSISTEMA EN TIEMPO REAL",
     franchise_map_title: "Mapa Global de Alianzas y Proyectos",
     franchise_map_desc: "Explore de manera interactiva nuestras sedes operativas, centros de innovación y campus de desarrollo.",
     
     franchise_roadmap_title: "Hoja de Ruta del Proyecto",
-    franchise_roadmap_subtitle: "Plan de desarrollo tecnológico modular en cuatro fases (Inicio: Octubre 2025)",
+    franchise_roadmap_subtitle: "Calendario sujeto a revisión y validación interna.",
     franchise_roadmap_phase: "Fase",
     
     phase1_title: "Fase 1: Intercambiadores de Calor de Pozo Profundo de Alta Eficiencia",
@@ -178,7 +178,7 @@ export const translations = {
     phase2_title: "Fase 2: Diseño y Fabricación de Turbogeneradores ORC de Alto Rendimiento",
     phase2_duration: "Duración estimada: 24 meses",
     phase2_goal: "Objetivo:",
-    phase2_goal_text: "Crear turbogeneradores optimizados para bajas y medias entalpías, con diseños modulares compactos, alta durabilidad física y una eficiencia de conversión superior al 20% en condiciones reales de operación.",
+    phase2_goal_text: "Estudiar turbogeneradores para bajas y medias entalpías mediante diseños modulares sujetos a validación técnica.",
     phase2_key: "Actividades clave:",
     phase2_key_text: "Diseño CAD-CAE avanzado, simulación digital dinámica de turbinas, fabricación a escala piloto en talleres especializados y pruebas experimentales en banco de ensayos.",
     
@@ -223,7 +223,7 @@ export const translations = {
     contact_reg_doc: "Documento Número: L21000169244",
 
     // Footer
-    footer_desc: "Tu energía, TU FUTURO. Generando rentabilidad con responsabilidad ecológica.",
+    footer_desc: "Tu energía, TU FUTURO. Innovación energética con responsabilidad ecológica.",
     footer_sections: "Secciones",
     footer_contact: "Contacto",
     footer_rights: "© {year} MAGMA POWER PLANT Inc. Todos los derechos reservados.",
@@ -249,7 +249,7 @@ export const translations = {
     mugara_title: "MUGARA",
     mugara_desc: "Plataforma tecnológica independiente para operar y predecir fallas en cualquier infraestructura energética, sin depender de un único fabricante u operador.",
     mugara_map_title: "Mapa global de activos",
-    mugara_map_desc: "49 plantas renovables de referencia a nivel mundial. Las coordenadas son aproximadas y están pendientes de validar contra Global Energy Monitor.",
+    mugara_map_desc: "Vista de referencia de 49 plantas renovables a nivel mundial. Las ubicaciones mostradas son aproximadas y no deben utilizarse para navegación ni análisis técnico.",
     mugara_about_title: "Qué es MUGARA",
     mugara_about1_title: "Independiente",
     mugara_about1_text: "MUGARA es una plataforma tecnológica propia, no un producto de marca blanca.",
@@ -291,10 +291,10 @@ export const translations = {
     // Impact Section
     impact_subtitle: "OUR IMPACT",
     impact_title: "High-Impact Efficient Solutions",
-    impact_desc: "We guarantee economic profitability while protecting the environment.",
+    impact_desc: "We promote energy efficiency with environmental responsibility.",
     
     impact_card1_title: "Cost Reduction",
-    impact_card1_text: "At MAGMA POWER PLANT, we help companies reduce costs through efficient energy management. Our solutions are designed to maximize savings and profitability from day one.",
+    impact_card1_text: "At MAGMA POWER PLANT, we help companies identify energy-efficiency and cost-reduction opportunities through solutions tailored to each project.",
     
     impact_card2_title: "Renewable Energy",
     impact_card2_text: "We promote the use of renewable energy by integrating clean sources into your daily operations. We implement advanced technology to harness heat and light responsibly.",
@@ -307,10 +307,10 @@ export const translations = {
     company_title: "The Company",
     company_desc: "Innovating in the utilization of Earth's resources since 2018.",
     company_intro_title: "We transform vision into global energy",
-    company_intro_p1: "Since 2018, **MAGMA POWER PLANT** has been offering sustainable and competitive energy solutions globally. We have developed an innovative process aimed at utilizing the Earth's internal heat through a **closed-loop energy transfer system**, in which only heat is exchanged with the thermal source, without any extraction or injection of matter in the subsoil.",
+    company_intro_p1: "Since 2018, MAGMA POWER PLANT has been offering sustainable and competitive energy solutions globally. We have developed an innovative process aimed at utilizing the Earth's internal heat through a closed-loop energy transfer system, in which only heat is exchanged with the thermal source, without any extraction or injection of matter in the subsoil.",
     company_intro_p2: "This principle represents a fundamental difference compared to conventional geothermal systems, where water or steam is extracted from reservoirs to drive turbines, generating alterations in the hydrothermal balance and potential environmental risks associated with reinjection, waste, or leaks.",
     company_science_title: "The Scientific Foundation",
-    company_science_text: "The process lies in the heat exchange in the **effective working thermal band**, defined as the usable thermal gradient originating from the dissipation of energy from magma to its immediate environment (rocks, fluids or steam). The heat is transferred through conduction, convection, and radiation to a low-enthalpy working fluid in a closed loop, which feeds an ORC (Organic Rankine Cycle) turbogenerator, converting deep heat into electricity without compromising the geological medium.",
+    company_science_text: "The process lies in the heat exchange in the effective working thermal band, defined as the usable thermal gradient originating from the dissipation of energy from magma to its immediate environment (rocks, fluids or steam). The heat is transferred through conduction, convection, and radiation to a low-enthalpy working fluid in a closed loop, which feeds an ORC (Organic Rankine Cycle) turbogenerator, converting deep heat into electricity without compromising the geological medium.",
     company_quote_title: "Geomagmatic Energy:",
     company_quote_text: "\"The form of renewable energy obtained through the process of extracting the internal heat of the earth regardless of the state of matter of the source containing it through a thermodynamically closed system which avoids the exchange of matter with the source.\"",
 
@@ -351,23 +351,23 @@ export const translations = {
     tech_title: "Our Technology",
     tech_desc: "Binary thermodynamic cycles and custom-designed turbogenerators.",
     tech_system_title: "The Binary Cycle and ORC System",
-    tech_p1: "Our **binary cycle** system harnesses heat from the thermal source using **deep borehole heat exchangers**, transforming it into electricity or industrial heat continuously, cleanly, and efficiently.",
-    tech_p2: "We design ORC plants of up to **50 MW**, equipped with special turbines and custom-designed binary cycle heat extractors that optimize heat transfer using organic working fluids. In addition, we have traditional geothermal steam plant models of up to **450 MW for large-scale continuous supplies.",
-    tech_p3: "We can integrate this cycle into a traditional steam cycle to obtain a **powerful combined cycle** that significantly increases the global efficiency of the power plant with a minimal surface footprint.",
+    tech_p1: "Our binary cycle system harnesses heat from the thermal source using deep borehole heat exchangers, transforming it into electricity or industrial heat continuously, cleanly, and efficiently.",
+    tech_p2: "We design modular ORC configurations with turbines and heat-transfer systems adapted to each project's conditions. We also assess conventional geothermal configurations for larger-scale applications.",
+    tech_p3: "We can integrate this cycle into a traditional steam cycle to obtain a powerful combined cycle that significantly increases the global efficiency of the power plant with a minimal surface footprint.",
     tech_specs_title: "Main Features of Our Power Plants",
     
     spec_orc_title: "Modular ORC Plants",
     spec_orc_desc: "Modular units easy to integrate into deep thermal boreholes and adaptable to real conditions.",
     spec_trad_title: "Traditional Capacity",
-    spec_trad_desc: "Large-scale traditional steam plants to meet massive industrial demands.",
+    spec_trad_desc: "Geothermal configurations assessed according to the available resource and project demand.",
     spec_ops_title: "Continuous Operation",
     spec_ops_desc: "Stable base load production, independent of weather conditions or time of day.",
     spec_range_title: "Thermal Range",
     spec_range_desc: "Excellent thermal performance optimized for low and medium enthalpy geothermal resources.",
     spec_emissions_title: "Direct Emissions",
-    spec_emissions_desc: "Clean thermodynamic operation without fossil fuels and with minimal water footprint.",
-    spec_homes_title: "Households Supplied",
-    spec_homes_desc: "Electricity supply sufficient to power entire cities sustainably.",
+    spec_emissions_desc: "Thermodynamic operation without combustion in the generation loop.",
+    spec_homes_title: "Project-Specific Design",
+    spec_homes_desc: "Sizing is subject to the thermal resource, demand and feasibility studies.",
 
     // Services Section
     services_subtitle: "WHAT WE DO",
@@ -375,7 +375,7 @@ export const translations = {
     services_desc: "We cover the entire cycle of design, installation, operation, and maintenance.",
     
     service1_title: "1. Solar Energy Plants",
-    service1_desc: "Design, development, and comprehensive management of solar energy plants. We offer feasibility studies, installation, operation, and maintenance to maximize the return on your solar investment and reduce your carbon footprint.",
+    service1_desc: "Design, development, and comprehensive management of solar energy plants. We offer feasibility studies, installation, operation, and maintenance focused on energy efficiency and reducing the carbon footprint.",
     
     service2_title: "2. Geothermal Energy Projects",
     service2_desc: "Feasibility studies of the resource, advanced design of deep boreholes, and installation of binary ORC cycle systems. Custom designs that optimize subsoil heat resources for stable power generation.",
@@ -390,7 +390,7 @@ export const translations = {
     scheduler_title: "Speak with Us. Book an Appointment",
     scheduler_subtitle: "Select the service, date, and time for your virtual or office appointment.",
     scheduler_label_service: "Type of service for your appointment *",
-    scheduler_label_day: "Select a day (August 2026) *",
+    scheduler_label_day: "Select a day in the current month *",
     scheduler_label_hour: "Select an available time *",
     scheduler_label_email: "Email *",
     scheduler_label_notes: "Briefly comment on your interest",
@@ -398,7 +398,7 @@ export const translations = {
     scheduler_btn_submit: "Book Appointment",
     
     scheduler_success_title: "Appointment Requested Successfully!",
-    scheduler_success_desc: "We have registered your request for the {service} service on August {day}, 2026 at {time}.",
+    scheduler_success_desc: "We have registered your request for the {service} service on {date} at {time}.",
     scheduler_success_email: "A mail with the details and the meeting link has been sent to: {email}.",
     scheduler_btn_reset: "Schedule another appointment",
 
@@ -406,7 +406,7 @@ export const translations = {
     team_subtitle: "EXPERT PROFESSIONALS",
     team_title: "Our Team",
     team_desc: "We have a highly committed multidisciplinary group.",
-    team_intro_p1: "The **MAGMA POWER PLANT** work team is made up of a multidisciplinary group of highly trained professionals committed to excellence. Integrated by specialists in engineering, technology, automation, project management, finance, and industrial safety, we bring our scientific knowledge and operational experience to guarantee innovative and high-performance solutions.",
+    team_intro_p1: "The MAGMA POWER PLANT work team is made up of a multidisciplinary group of highly trained professionals committed to excellence. Integrated by specialists in engineering, technology, automation, project management, finance, and industrial safety, we bring our scientific knowledge and operational experience to guarantee innovative and high-performance solutions.",
     team_intro_p2: "Each member shares a common vision oriented towards quality, sustainability, and continuous improvement, working in close collaboration to exceed our clients' goals and lead the global energy transition.",
     
     team_card1_title: "Engineering & Thermodynamics",
@@ -419,21 +419,21 @@ export const translations = {
     team_card4_text: "Strategic profitability analysis for partners, compliance with standards, and subsoil environmental safety.",
 
     // Franchises Section
-    franchise_subtitle: "INVESTMENT OPPORTUNITY",
+    franchise_subtitle: "INFORMATION UNDER REVIEW",
     franchise_title: "Renewable Energy Franchises",
-    franchise_desc: "Join a highly profitable business model with great future projection.",
+    franchise_desc: "This information is not publicly available while its legal review is completed.",
     franchise_intro_h3: "Take the first step towards the future of energy!",
-    franchise_intro_p: "If you are ready to invest safely in a high-performance model, we offer you exclusive access to our global Joint Ventures and Technological Franchises scheme. We have preferential initial conditions for founding strategic partners.",
+    franchise_intro_p: "For institutional inquiries, please use the contact form.",
     franchise_docs_title: "Official Project Documentation:",
-    franchise_doc_cert: "Franchise Certificate (Demo)",
-    franchise_doc_protocol: "Franchise Protocol (PDF)",
+    franchise_doc_cert: "Document unavailable",
+    franchise_doc_protocol: "Document unavailable",
     
     franchise_map_subtitle: "REAL-TIME ECOSYSTEM",
     franchise_map_title: "Global Map of Alliances and Projects",
     franchise_map_desc: "Interactively explore our operating headquarters, innovation centers, and development campuses.",
     
     franchise_roadmap_title: "Project Roadmap",
-    franchise_roadmap_subtitle: "Modular technological development plan in four phases (Start: October 2025)",
+    franchise_roadmap_subtitle: "Timeline subject to internal review and validation.",
     franchise_roadmap_phase: "Phase",
     
     phase1_title: "Phase 1: High-Efficiency Deep Borehole Heat Exchangers",
@@ -446,7 +446,7 @@ export const translations = {
     phase2_title: "Phase 2: Design and Manufacture of High-Performance ORC Turbogenerators",
     phase2_duration: "Estimated duration: 24 months",
     phase2_goal: "Goal:",
-    phase2_goal_text: "Create turbogenerators optimized for low and medium enthalpies, with compact modular designs, high physical durability, and a conversion efficiency superior to 20% in real operating conditions.",
+    phase2_goal_text: "Assess turbogenerators for low and medium enthalpy applications through modular designs subject to technical validation.",
     phase2_key: "Key activities:",
     phase2_key_text: "Advanced CAD-CAE design, dynamic digital simulation of turbines, pilot scale manufacturing in specialized workshops, and experimental bench tests.",
     
@@ -491,7 +491,7 @@ export const translations = {
     contact_reg_doc: "Document Number: L21000169244",
 
     // Footer
-    footer_desc: "Your energy, YOUR FUTURE. Generating profitability with ecological responsibility.",
+    footer_desc: "Your energy, YOUR FUTURE. Energy innovation with environmental responsibility.",
     footer_sections: "Sections",
     footer_contact: "Contact",
     footer_rights: "© {year} MAGMA POWER PLANT Inc. All rights reserved.",
@@ -517,7 +517,7 @@ export const translations = {
     mugara_title: "MUGARA",
     mugara_desc: "Independent technology platform to operate and predict failures across any energy infrastructure, without depending on a single manufacturer or operator.",
     mugara_map_title: "Global asset map",
-    mugara_map_desc: "49 benchmark renewable plants worldwide. Coordinates are approximate and pending validation against Global Energy Monitor.",
+    mugara_map_desc: "Reference view of 49 renewable plants worldwide. Locations shown are approximate and must not be used for navigation or technical analysis.",
     mugara_about_title: "What is MUGARA",
     mugara_about1_title: "Independent",
     mugara_about1_text: "MUGARA is a proprietary technology platform, not a white-label infrastructure product.",
